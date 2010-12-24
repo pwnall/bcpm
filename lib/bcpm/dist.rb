@@ -33,6 +33,16 @@ module Dist
   def self.installed?
     Bcpm::Config.config.has_key? :dist_path
   end
+    
+  # Path to the battlecode ant file.
+  def self.ant_file
+    File.join dist_path, 'build.xml'
+  end
+  
+  # Path to the battlecode simulator configuration file.
+  def self.conf_file
+    File.join dist_path, 'bc.conf'
+  end
   
   # Clones the repository holding the battlecode distribution.
   def self.clone_repo

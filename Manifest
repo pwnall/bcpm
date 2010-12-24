@@ -7,4 +7,5 @@ lib/bcpm.rb
 lib/bcpm/cli.rb
 lib/bcpm/config.rb
 lib/bcpm/dist.rb
+lib/bcpm/match.rb
 lib/bcpm/player.rb
