@@ -14,6 +14,10 @@ USAGE
 After executing the commands above, import the project into Eclipse
 (File > Import > Existing Projects into Workspace).
 
+3. Run a game against some other player code.
+
+    bcpm match team989 team000 venice
+
 
 INSTALLATION
 
