@@ -1,0 +1,9 @@
+CHANGELOG
+README
+Rakefile
+bin/bcpm
+lib/bcpm.rb
+lib/bcpm/cli.rb
+lib/bcpm/config.rb
+lib/bcpm/dist.rb
+Manifest

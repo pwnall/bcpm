@@ -1,0 +1,22 @@
+Battlecode (MIT 6.470) package manager.
+
+USAGE
+
+Install the Battlecode distribution. Later, use the same command to update the distribution.
+
+   bcpm dist
+
+
+INSTALLATION
+
+On Ubuntu:
+   
+    sudo apt-get install ruby-full rubygems
+    sudo gem install rubygems-update
+    sudo `gem env | grep 'EXECUTABLE DIRECTORY' | ruby -e "puts gets.split(': ', 2).last"`/update_rubygems
+
+On both OSX and Ubuntu:
+   
+    sudo gem install echoe flexmock
+    git clone git@git.pwnb.us:six370/bcpm
+    rake install
