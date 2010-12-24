@@ -13,6 +13,14 @@ module CLI
     case args.first
     when 'dist'  # Install or upgrade the battlecode distribution.
       Bcpm::Dist.upgrade
+    when 'install'   
+      unless Bcpm::Dist.installed?
+        puts "Install a battlecode distribution first."
+        return
+      end      
+      Bcpm::Player.install args[1], args[2]
+    else
+      help
     end
   end
   

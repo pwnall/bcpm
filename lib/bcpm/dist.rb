@@ -4,12 +4,18 @@ require 'fileutils'
 module Bcpm
 
 # Battle-code distribution management.
-module Dist 
+module Dist
+  # Hooks a player's code into the installed battlecode distribution.
+  def self.add_player(player_path)
+    team_path = File.join dist_path, 'teams', File.basename(player_path)
+    FileUtils.ln_s player_path, team_path
+  end
+  
   # Upgrades the installed battlecode distribution to the latest version.
   #
   # Does a fresh install if no distribution is configured.
   def self.upgrade
-    return install unless Bcpm::Config[:dist_path]
+    return install unless Bcpm::Dist.installed?
     
     Dir.chdir dist_path do
       Kernel.system 'git', 'pull', 'origin', 'master'
@@ -22,6 +28,11 @@ module Dist
     Bcpm::Config[:dist_repo_uri] = repo_uri
     Bcpm::Config[:dist_path] = dist_path
   end  
+
+  # True if a battlecode distribution is installed on the local machine.
+  def self.installed?
+    Bcpm::Config.config.has_key? :dist_path
+  end
   
   # Clones the repository holding the battlecode distribution.
   def self.clone_repo

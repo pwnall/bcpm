@@ -7,3 +7,4 @@ end
 require 'bcpm/cli.rb'
 require 'bcpm/config.rb'
 require 'bcpm/dist.rb'
+require 'bcpm/player.rb'
