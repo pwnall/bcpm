@@ -5,6 +5,10 @@ USAGE
 Install the Battlecode distribution. Later, use the same command to update the distribution.
 
    bcpm dist
+   
+Check out a player repository and set it up for development.
+
+   bcpm install git@git.pwnb.us:six370/team989.git
 
 
 INSTALLATION
