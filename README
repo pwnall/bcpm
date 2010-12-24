@@ -2,13 +2,17 @@ Battlecode (MIT 6.470) package manager.
 
 USAGE
 
-Install the Battlecode distribution. Later, use the same command to update the distribution.
+1. Install the Battlecode distribution. Later, use the same command to update the distribution.
 
    bcpm dist
    
-Check out a player repository and set it up for development.
+2. Check out a player repository and set it up for development.
 
+   cd ~/workspace  # Your Eclipse workspace.
    bcpm install git@git.pwnb.us:six370/team989.git
+
+After executing the commands above, import the project into Eclipse
+(File > Import > Existing Projects into Workspace).
 
 
 INSTALLATION
