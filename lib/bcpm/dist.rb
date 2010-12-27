@@ -56,8 +56,7 @@ module Dist
     
   # Path to the locally installed battlecode distribution.
   def self.dist_path
-    return Bcpm::Config[:dist_path] if Bcpm::Config[:dist_path]
-    default_dist_path
+    Bcpm::Config[:dist_path] || default_dist_path
   end
 
   # Path to the locally installed battlecode distribution.
@@ -71,8 +70,7 @@ module Dist
 
   # Git URI to the distribution repository.
   def self.repo_uri
-    return Bcpm::Config[:dist_repo_uri] if Bcpm::Config[:dist_repo_uri]
-    default_repo_uri
+    Bcpm::Config[:dist_repo_uri] || default_repo_uri
   end
   
   # Git URI to the distribution repository.  
