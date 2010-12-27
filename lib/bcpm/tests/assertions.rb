@@ -5,15 +5,10 @@ module Bcpm
 module Tests
   
 # Assertions for match tests.
-module Assertions
-  # The match output, split into lines.
-  def _output_lines
-    @_output_lines ||= output.split("\n")
-  end
-  
+module Assertions  
   # Fails unless the match was won.
   def should_win
-    return if _output_lines[-3].index(' (A) wins')
+    return match.output_lines[-3].index(' (A) wins')
     raise Bcpm::Tests::AssertionError, 'Player was expected to win, but lost'
   end
 
@@ -23,12 +18,12 @@ module Assertions
     
     return if output_lines[-2].index(reason)
     raise Bcpm::Tests::AssertionError, "Player was expected to win by #{reason} and didn't. " +
-        _output_lines[-2]
+        match.output_lines[-2]
   end  
 
   # Fails if the player code threw any exception.
   def should_not_throw
-    if output.index(/^(\S*)Exception:/)
+    if match.output.index(/^(\S*)Exception:/)
       raise Bcpm::Tests::AssertionError, "Player should not have thrown exceptions. " +
           "It threw #{$1}Exception"
     end

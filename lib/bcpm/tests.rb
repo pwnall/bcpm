@@ -1,5 +1,3 @@
-require 'English'
-
 # :nodoc: namespace
 module Bcpm
 
@@ -28,20 +26,11 @@ module Tests
   
   # Runs the test suite against a player codebase.
   def self.run(player_name_or_uri, branch = 'master')
-    suite = new_suite
-    env_base = "test_#{(Time.now.to_f * 1000).to_i}_#{$PID}_"
-    
-    env_names = (1..(suite.tests.count)).map { |i| env_base + i.to_s }
-    env_names.each_with_index do |env_name, i|
-      Bcpm::Player.checkpoint player_name_or_uri, branch, env_name
-      # TODO(pwnall): patch environment according to testcase
-    end
-    
-    suite.run env_names    
-
-    env_names.each_with_index do |env_name, i|
-      Bcpm::Player.uninstall env_name
-    end
+    suite = new_suite    
+    suite.environments.each { |e| e.setup player_name_or_uri, branch }
+    suite.run
+    suite.environments.each { |e| e.teardown }
+    suite
   end
   
   # Creates a Suite instance for running all the tests.

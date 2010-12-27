@@ -9,11 +9,14 @@ module Tests
 # Each test case is its own anonymous class.
 class CaseBase
   class <<self
-    # Called before any code is evaluated in the class.
+    # Called before any code is evaluated in the class context.
     def setup
       @map = nil
       @vs = nil
+      @match = nil
       @tests = []
+      @environments = []
+      @matches = []
     end
   
     # Set the map for following matches.
@@ -28,48 +31,60 @@ class CaseBase
   
     # TODO(pwnall): patch data
   
-    # Create a match test. The block contains assertions for the match.
-    def match(label = '(no description)', &block)
-      # TODO(pwnall): environment processing
-      # TODO(pwnall): pass patch data
-      @tests << self.new(label, @vs, @map, block)
+    # Create a test match. The block contains test cases for the match.
+    def match(&block)
+      begin
+        @match = Bcpm::Tests::TestMatch.new @vs, @map
+        self.class_eval(&block)
+        @matches << @match
+        # TODO(pwnall): environment reuse
+        @environments << @match.environment
+      ensure
+        @match = nil
+      end
     end
 
-    # All match tests.
+    # Create a test match.
+    def it(label, &block)
+      raise "it can only be called within match blocks!" if @match.nil?        
+      @tests << self.new(label, @match, block)
+    end
+
+    # All the environments used in the tests.
+    attr_reader :environments
+    # All the matches used in the tests.
+    attr_reader :matches
+    # All test cases.
     attr_reader :tests
   end
   
-  # Descriptive label for the match test.
+  # Descriptive label for the test case.
   attr_reader :label
-  # Name of opposing player in the match.
-  attr_reader :vs  
-  # Name of map for the match.
-  attr_reader :map
-  # Match output.
-  attr_reader :output
-
+  # Test match used by the test case.
+  attr_reader :match
+  
   # Called by match.
-  def initialize(label, vs, map, block)
+  def initialize(label, match, block)
     @label = label
-    @vs = vs
-    @map = map
+    @match = match
     @block = block
   end
   
   # User-readable description of test conditions.
   def description
-    "vs #{vs} on #{map} (#{label})"
+    "#{match.description} #{label}"
   end
 
-  # Verifies the match output against the tests.
-  def check_output(output)
-    @output = output
+  # Verifies the match output against the test case.
+  #
+  # Returns nil for success, or an AssertionError exception if the case failed.
+  def check_output
     begin
       self.instance_eval &@block
       return nil
     rescue Bcpm::Tests::AssertionError => e
       return e
-    end      
+    end
   end
   
   include Bcpm::Tests::Assertions

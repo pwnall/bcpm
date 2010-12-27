@@ -6,7 +6,11 @@ module Tests
 
 # Collection of test cases.
 class Suite
-  # All the tests in the suite.
+  # All the environments used in the tests.
+  attr_reader :environments
+  # All the matches used in the tests.
+  attr_reader :matches
+  # All test cases.
   attr_reader :tests
   
   # New suite.
@@ -15,6 +19,8 @@ class Suite
   #   case_files:: paths to the files containing test cases
   def initialize(case_files)
     @tests = []
+    @matches = []
+    @environments = []
     
     case_files.each do |file|
       code = File.read file
@@ -22,22 +28,21 @@ class Suite
       klass.setup
       klass.class_eval code, file
       @tests += klass.tests
+      @matches += klass.matches
+      @environments += klass.environments
     end
   end
   
   # Runs all the tests in the suite.
-  #
-  # Args:
-  #   env_names:: the local player names used to host the test environments.
-  def run(env_names)
+  def run
     wins, fails, errors, totals = 0, 0, 0, 0
     failures = []
     tests.each_with_index do |test, i|
-      env_name = env_names[i]  # TODO(pwnall): env based on test      
-      output = Bcpm::Match.match_data env_names[i], test.vs, test.map
+      test.match.run unless test.match.ran?
       failure_string = nil
       begin
-        if failure_string = test.check_output(output[:ant])
+        if failure = test.check_output
+          failure_string = "#{failure.to_s}\n#{failure.backtrace.join("\n")}"
           fails += 1
           print 'F'
         else
@@ -46,7 +51,7 @@ class Suite
         end        
       rescue Exception => e
         errors += 1
-        failure_string = "#{e.class.name}: #{e.to_s}\n#{e.backtrace.join("\n")}\n"
+        failure_string = "#{e.class.name}: #{e.to_s}\n#{e.backtrace.join("\n")}"
       end
       totals += 1
       if failure_string

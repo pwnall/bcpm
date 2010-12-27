@@ -14,4 +14,6 @@ lib/bcpm/tests.rb
 lib/bcpm/tests/assertion_error.rb
 lib/bcpm/tests/assertions.rb
 lib/bcpm/tests/case_base.rb
+lib/bcpm/tests/environment.rb
 lib/bcpm/tests/suite.rb
+lib/bcpm/tests/test_match.rb
