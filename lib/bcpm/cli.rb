@@ -13,7 +13,9 @@ module CLI
     case args.first
     when 'dist'  # Install or upgrade the battlecode distribution.
       Bcpm::Dist.upgrade
-    when 'install'   
+    when 'suite'  # Install or upgrade the test suite.
+      Bcpm::Tests.upgrade
+    when 'install'  # Add a player project to the workspace, from a git repository.
       unless Bcpm::Dist.installed?
         puts "Please install a battlecode distribution first!"
         exit 1
@@ -23,7 +25,7 @@ module CLI
         exit 1
       end 
       Bcpm::Player.install args[1], args[2]
-    when 'new'
+    when 'new'  # Create a new player project using an existing project as a template.
       unless Bcpm::Dist.installed?
         puts "Please install a battlecode distribution first!"
         exit 1
@@ -33,13 +35,19 @@ module CLI
         exit 1
       end 
       Bcpm::Player.checkpoint args[2], 'master', args[1]
-    when 'uninstall', 'remove'
+    when 'uninstall', 'remove'  # Remove a player project from the workspace.
       if args.length < 2
         puts "Please supply the player name!"
         exit 1
       end 
       Bcpm::Player.uninstall args[1]
-    when 'match'
+    when 'rewire', 'config'  # Re-write a player project's configuration files.
+      if args.length < 2
+        puts "Please supply the player name!"
+        exit 1
+      end 
+      Bcpm::Player.reconfigure args[1]      
+    when 'match'  # Run a match in headless mode, dump the output to stdout.
       unless Bcpm::Dist.installed?
         puts "Please install a battlecode distribution first!"
         exit 1

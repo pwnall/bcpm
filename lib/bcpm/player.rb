@@ -56,7 +56,13 @@ module Player
     source_path = package_path local_path
     Bcpm::Dist.remove_player source_path
     FileUtils.rm_rf local_path
-  end  
+  end
+  
+  # Re-configures a player's source code project.
+  def self.reconfigure(local_name)
+    local_path = File.join local_root, local_name
+    configure local_path
+  end
 
   # Configures a player's source code project.
   def self.configure(local_path)
@@ -163,7 +169,7 @@ module Player
 <classpath>
   <classpathentry kind="src" path="src"/>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-  <classpathentry kind="lib" path="#{jar_path}"/>
+  <classpathentry exported="true" kind="lib" path="#{jar_path}"/>
   <classpathentry kind="output" path="bin"/>
 </classpath>
 END_CONFIG
@@ -172,7 +178,6 @@ END_CONFIG
   # The contents of an Eclipse .project file for a player project.
   def self.eclipse_project(local_path)
     project_name = File.basename local_path
-    build_path = File.join Bcpm::Dist.dist_path, 'build.xml'
     
     <<END_CONFIG
 <?xml version="1.0" encoding="UTF-8"?>

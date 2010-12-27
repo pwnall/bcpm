@@ -26,6 +26,13 @@ module Git
       File.unlink zip_file
     end
   end
+  
+  # Pulls the latest changes into the repository.
+  def self.update_repo(local_path)
+    Dir.chdir local_path do
+      Kernel.system 'git', 'pull'
+    end
+  end
 end  # module Bcpm::Git
 
 end  # namespace Bcpm

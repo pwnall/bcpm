@@ -25,11 +25,8 @@ module Dist
   #
   # Does a fresh install if no distribution is configured.
   def self.upgrade
-    return install unless Bcpm::Dist.installed?
-    
-    Dir.chdir dist_path do
-      Kernel.system 'git', 'pull', 'origin', 'master'
-    end
+    return install unless installed?
+    Bcpm::Git.update_repo dist_path
   end
   
   # Installs the latest battlecode distribution.
