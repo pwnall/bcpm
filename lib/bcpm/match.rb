@@ -58,14 +58,7 @@ module Match
   
   # Writes a patched buildfile that references the given configuration file.
   def self.write_build(buildfile, conffile)
-    contents = File.read Bcpm::Dist.ant_file
-    # Point to the distribution instead of current root.
-    contents.gsub! 'basedir="."', 'basedir="' + Bcpm::Dist.dist_path + '"'
-    contents.gsub! '<property name="path.base" location="."',
-        '<property name="path.base" location="' + Bcpm::Dist.dist_path + '"'
-    # Replace hardcoded bc.conf reference.
-    contents.gsub! 'bc.conf', conffile
-
+    contents = Bcpm::Player.ant_config conffile
     File.open(buildfile, 'w') { |f| f.write contents }
   end
   

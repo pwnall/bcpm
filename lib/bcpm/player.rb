@@ -67,6 +67,10 @@ module Player
     File.open File.join(local_path, '.classpath'), 'w' do |f|
       f.write eclipse_classpath(local_path)
     end
+    
+    File.open File.join(local_path, 'build.xml'), 'w' do |f|
+      f.write ant_config('bc.conf')
+    end
   end
   
   # The directory containing all players code.
@@ -137,6 +141,18 @@ module Player
     end
     path
   end
+  
+  # The contents of an Ant configuration file (build.xml) pointing to a simulator config file.
+  def self.ant_config(simulator_config)
+    contents = File.read Bcpm::Dist.ant_file
+    # Point to the distribution instead of current root.
+    contents.gsub! 'basedir="."', 'basedir="' + Bcpm::Dist.dist_path + '"'
+    contents.gsub! '<property name="path.base" location="."',
+        '<property name="path.base" location="' + Bcpm::Dist.dist_path + '"'
+    # Replace hardcoded bc.conf reference.
+    contents.gsub! 'bc.conf', simulator_config
+    contents
+  end
 
   # The contents of an Eclipse .classpath for a player project.  
   def self.eclipse_classpath(local_path)
@@ -175,13 +191,6 @@ END_CONFIG
   <natures>
     <nature>org.eclipse.jdt.core.javanature</nature>
   </natures>
-  <linkedResources>
-    <link>
-      <name>build.xml</name>
-      <type>1</type>
-      <location>#{build_path}</location>
-    </link>
-  </linkedResources>
 </projectDescription>
 END_CONFIG
   end

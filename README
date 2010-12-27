@@ -9,15 +9,20 @@ USAGE
 2. Check out a player repository and set it up for development.
 
    cd ~/workspace  # Your Eclipse workspace.
-   bcpm install git@git.pwnb.us:six370/team989.git
+   bcpm install git@git.pwnb.us:six370/yield.git
 
 After executing the commands above, import the project into Eclipse
 (File > Import > Existing Projects into Workspace).
 
 3. Run a game against some other player code.
 
-    bcpm match team989 team000 venice
+    bcpm match yield team000 venice
+    
+4. Create a new player from an existing template.
 
+   bcpm new myplayer git@git.pwnb.us:six370/yield.git
+
+You'll need to import the project into Eclipse, and setup a git repository for the player.
 
 INSTALLATION
 
@@ -30,5 +35,5 @@ On Ubuntu:
 On both OSX and Ubuntu:
    
     sudo gem install echoe flexmock
-    git clone git@git.pwnb.us:six370/bcpm
+    git clone git@git.pwnb.us:six370/bcpm.git
     rake install
