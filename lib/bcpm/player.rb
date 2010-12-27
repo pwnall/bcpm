@@ -1,9 +1,13 @@
+require 'fileutils'
+
 # :nodoc: namespace
 module Bcpm
 
 # Manages player packages.
 module Player
-  # Clones a player code from a repository, and sets it up on the local machine.
+  # Clones a player code from a repository, and sets it up for development on the local machine.
+  #
+  # Returns the player's name.
   def self.install(repo_uri, repo_branch)
     repo_branch ||= 'master'
 
@@ -13,7 +17,7 @@ module Player
       puts "Player already installed at #{local_path}!"
       exit 1
     end    
-    clone_repo repo_uri, repo_branch, local_path
+    Bcpm::Git.clone_repo repo_uri, repo_branch, local_path
     
     unless source_path = package_path(local_path)
       puts "Repository doesn't seem to contain a player!"
@@ -23,7 +27,36 @@ module Player
         
     Bcpm::Dist.add_player source_path
     configure local_path
+    name
   end
+  
+  # Downloads player code from a repository for one-time use, without linking it to the repository.
+  def self.checkpoint(repo_uri, repo_branch, local_name)
+    old_name = player_name repo_uri
+    local_path = File.join local_root, local_name
+    if File.exist?(local_path)
+      puts "Player already installed at #{local_path}!"
+      exit 1
+    end
+    Bcpm::Git.checkpoint_repo repo_uri, repo_branch, local_path
+    unless source_path = rename(local_path, old_name)
+      puts "Repository doesn't seem to contain a player!"
+      FileUtils.rm_rf local_path      
+      exit 1
+    end
+
+    Bcpm::Dist.add_player source_path
+    configure local_path
+    local_name
+  end
+
+  # Undoes the effects of an install or checkpoint call.
+  def self.uninstall(local_name)
+    local_path = File.join local_root, local_name
+    source_path = package_path local_path
+    Bcpm::Dist.remove_player source_path
+    FileUtils.rm_rf local_path
+  end  
 
   # Configures a player's source code project.
   def self.configure(local_path)
@@ -33,14 +66,6 @@ module Player
     
     File.open File.join(local_path, '.classpath'), 'w' do |f|
       f.write eclipse_classpath(local_path)
-    end
-  end
-
-  # Clones a player code from a repository.  
-  def self.clone_repo(repo_uri, repo_branch, local_path)
-    FileUtils.mkdir_p local_path
-    Dir.chdir File.dirname(local_path) do
-      Kernel.system 'git', 'clone', '--branch', repo_branch, repo_uri, File.basename(local_path)
     end
   end
   
@@ -66,8 +91,30 @@ module Player
     name
   end
   
+  # Renames a player to match its path on the local system.
+  #
+  # Returns the path to the player's source package.
+  def self.rename(local_path, old_name)
+    new_name = File.basename local_path    
+    return nil unless old_source_dir = package_path(local_path, old_name)
+    new_source_dir = File.join File.dirname(old_source_dir), new_name
+    FileUtils.mv old_source_dir, new_source_dir
+    
+    Dir.glob(File.join(new_source_dir, '**', '*.java')).each do |file|
+      contents = File.read file
+      contents.gsub! /([^A-Za-z0-9_.])#{old_name}([^A-Za-z0-9_])/, "\\1#{new_name}\\2"
+      File.open(file, 'w') { |f| f.write contents }
+    end
+    new_source_dir
+  end
+  
   # Extracts the path to a player's source package given their repository.
-  def self.package_path(local_path)
+  #
+  # Args:
+  #   local_path:: path to the player's git repository on the local machine
+  #   name_override:: (optional) supplies the player name; if not set, the name is extracted from
+  #                   the path, by convention 
+  def self.package_path(local_path, name_override = nil)
     # All the packages should be in the 'src' directory.
     source_dir = File.join local_path, 'src'
     unless File.exist? source_dir
@@ -84,7 +131,7 @@ module Player
     end
 
     path = package_dirs.first
-    unless File.basename(local_path) == File.basename(path)
+    unless (name_override || File.basename(local_path)) == File.basename(path)
       puts "The package in the src directory doesn't match the player name!"
       return nil
     end

@@ -23,6 +23,22 @@ module CLI
         exit 1
       end 
       Bcpm::Player.install args[1], args[2]
+    when 'new'
+      unless Bcpm::Dist.installed?
+        puts "Please install a battlecode distribution first!"
+        exit 1
+      end
+      if args.length < 3
+        puts "Please supply the new player name, and the path to the template player repository!"
+        exit 1
+      end 
+      Bcpm::Player.checkpoint args[2], 'master', args[1]
+    when 'uninstall', 'remove'
+      if args.length < 2
+        puts "Please supply the player name!"
+        exit 1
+      end 
+      Bcpm::Player.uninstall args[1]
     when 'match'
       unless Bcpm::Dist.installed?
         puts "Please install a battlecode distribution first!"
@@ -33,7 +49,7 @@ module CLI
         exit 1
       end
       output = Bcpm::Match.run args[1], args[2], args[3]
-      puts output
+      puts output    
     else
       help
       exit 1

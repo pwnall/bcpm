@@ -10,6 +10,16 @@ module Dist
     team_path = File.join dist_path, 'teams', File.basename(player_path)
     FileUtils.ln_s player_path, team_path
   end
+
+  # Unhooks a player's code from the installed battlecode distribution.
+  def self.remove_player(player_path)
+    team_path = File.join dist_path, 'teams', File.basename(player_path)
+    unless File.exist?(team_path) && File.symlink?(team_path) &&
+           File.readlink(team_path) == player_path   
+      return
+    end
+    File.unlink team_path
+  end
   
   # Upgrades the installed battlecode distribution to the latest version.
   #
@@ -24,7 +34,7 @@ module Dist
   
   # Installs the latest battlecode distribution.
   def self.install
-    clone_repo
+    Bcpm::Git.clone_repo repo_uri, 'master', dist_path
     Bcpm::Config[:dist_repo_uri] = repo_uri
     Bcpm::Config[:dist_path] = dist_path
   end  
@@ -43,15 +53,7 @@ module Dist
   def self.conf_file
     File.join dist_path, 'bc.conf'
   end
-  
-  # Clones the repository holding the battlecode distribution.
-  def self.clone_repo
-    FileUtils.mkdir_p dist_path
-    Dir.chdir File.dirname(dist_path) do
-      Kernel.system 'git', 'clone', repo_uri, File.basename(dist_path)
-    end
-  end
-  
+    
   # Path to the locally installed battlecode distribution.
   def self.dist_path
     return Bcpm::Config[:dist_path] if Bcpm::Config[:dist_path]
