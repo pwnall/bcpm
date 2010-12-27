@@ -38,7 +38,11 @@ module Player
       puts "Player already installed at #{local_path}!"
       exit 1
     end
-    Bcpm::Git.checkpoint_repo repo_uri, repo_branch, local_path
+    if old_name == repo_uri
+      Bcpm::Git.checkpoint_local_repo File.join(local_root, old_name), local_path
+    else
+      Bcpm::Git.checkpoint_repo repo_uri, repo_branch, local_path
+    end
     unless source_path = rename(local_path, old_name)
       puts "Repository doesn't seem to contain a player!"
       FileUtils.rm_rf local_path      

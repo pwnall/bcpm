@@ -14,13 +14,41 @@ module Tests
     configure suite_path
   end
   
-  # Installs the latest battlecode distribution.
+  # Installs the latest test suite.
   def self.install
     Bcpm::Git.clone_repo repo_uri, 'master', suite_path
+
+    unless configure(suite_path) && File.exist?(File.join(suite_path, 'suite'))
+      puts "Repository does not contain a test suite!"
+      exit 1
+    end    
     Bcpm::Config[:tests_repo_uri] = repo_uri
     Bcpm::Config[:tests_path] = suite_path
-    configure suite_path
-  end  
+  end
+  
+  # Runs the test suite against a player codebase.
+  def self.run(player_name_or_uri, branch = 'master')
+    suite = new_suite
+    env_base = "test_#{(Time.now.to_f * 1000).to_i}_#{$PID}_"
+    
+    env_names = (1..(suite.tests.count)).map { |i| env_base + i.to_s }
+    env_names.each_with_index do |env_name, i|
+      Bcpm::Player.checkpoint player_name_or_uri, branch, env_name
+      # TODO(pwnall): patch environment according to testcase
+    end
+    
+    suite.run env_names    
+
+    env_names.each_with_index do |env_name, i|
+      Bcpm::Player.uninstall env_name
+    end
+  end
+  
+  # Creates a Suite instance for running all the tests.
+  def self.new_suite
+    files = Dir.glob File.join(suite_path, 'suite', '**', '*.rb')
+    Bcpm::Tests::Suite.new files
+  end
 
   # True if a battlecode distribution is installed on the local machine.
   def self.installed?
@@ -76,7 +104,7 @@ module Tests
   
   # Configures a test suite project.
   def self.configure(local_path)
-    config = configuration local_path
+    return nil unless config = configuration(local_path)
     Bcpm::Config[:test_target_player] = config[:target_player]
     
     File.open File.join(local_path, '.project'), 'w' do |f|
@@ -86,6 +114,7 @@ module Tests
     File.open File.join(local_path, '.classpath'), 'w' do |f|
       f.write eclipse_classpath(local_path)
     end
+    config
   end  
   
   # The contents of an Eclipse .classpath for a test suite.
@@ -125,6 +154,7 @@ END_CONFIG
 </projectDescription>
 END_CONFIG
   end  
-end  # module Bcpm::Test
+
+end  # module Bcpm::Tests
 
 end  # namespace Bcpm

@@ -5,20 +5,31 @@ USAGE
 1. Install the Battlecode distribution. Later, use the same command to update the distribution.
 
    bcpm dist
+
+2. Install the test suite.  Later, use the same command to update the suite.
+
+   bcpm suite
+
+After executing the commands above, import the project into Eclipse
+(File > Import > Existing Projects into Workspace).
    
-2. Check out a player repository and set it up for development.
+3. Check out a player repository and set it up for development.
 
    cd ~/workspace  # Your Eclipse workspace.
    bcpm install git@git.pwnb.us:six370/yield.git
 
-After executing the commands above, import the project into Eclipse
-(File > Import > Existing Projects into Workspace).
+You'll need to import the project into Eclipse.
 
-3. Run a game against some other player code.
+4. Run the tests against the player.
+
+    bcpm test yield
+    bcpm test git@git.pwnb.us:six370/yield.git
+
+5. Run a game against some other player code.
 
     bcpm match yield team000 venice
     
-4. Create a new player from an existing template.
+6. Create a new player from an existing template.
 
    bcpm new myplayer git@git.pwnb.us:six370/yield.git
 

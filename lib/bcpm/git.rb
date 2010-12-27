@@ -27,6 +27,15 @@ module Git
     end
   end
   
+  # Checks out the working copy of the repository.
+  def self.checkpoint_local_repo(repo_path, local_path)
+    FileUtils.mkdir_p local_path
+    Dir.entries(repo_path).each do |entry|
+      next if ['.', '..', '.git'].include? entry
+      FileUtils.cp_r File.join(repo_path, entry), local_path
+    end
+  end
+  
   # Pulls the latest changes into the repository.
   def self.update_repo(local_path)
     Dir.chdir local_path do

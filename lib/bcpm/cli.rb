@@ -57,7 +57,17 @@ module CLI
         exit 1
       end
       output = Bcpm::Match.run args[1], args[2], args[3]
-      puts output    
+      puts output
+    when 'test'
+      unless Bcpm::Tests.installed?
+        puts "Please install a test suite first!"
+        exit 1
+      end
+      if args.length < 2
+        puts "Please supply the player name or repository!"
+        exit 1
+      end
+      Bcpm::Tests.run args[1]
     else
       help
       exit 1
