@@ -53,9 +53,10 @@ class Suite
         failures << [test, failure_string]
       end
     end
-    print "\n#{totals} tests, #{wins} passed, #{fails} failures, #{errors} errors\n"
-    failures.each do |test, string|
-      print "\nFailed #{test.description}\n#{string}\n"
+    print "\n#{totals} tests, #{wins} passed, #{fails} failures, #{errors} errors\n\n"
+    failures.each_with_index do |failure, i|
+      test, string = *failure
+      print "#{'%3d' % (i + 1)}) Failed #{test.description}\n#{string}\n\n"
     end
   end
 end  # class Bcpm::Tests::Suite

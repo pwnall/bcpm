@@ -1,4 +1,5 @@
 require 'English'
+require 'shellwords'
 
 # :nodoc: namespace
 module Bcpm
@@ -75,8 +76,8 @@ module Match
   
   # Runs the battlecode Ant script.
   def self.run_build_script(build_file, conf_file, log_file, target)
-    Kernel.system 'ant', '-noinput', '-buildfile', build_file, '-Dbcconf=' + conf_file,
-                  '-logfile', log_file, target
+    Kernel.`(Shellwords.shelljoin(['ant', '-noinput', '-buildfile', build_file,
+        '-Dbcconf=' + conf_file, '-logfile', log_file, target]))
   end
   
   # Selects the battlecode simulator log out of an ant log.
