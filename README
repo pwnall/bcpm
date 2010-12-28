@@ -67,6 +67,13 @@ functionality available in a test suite. The suite DSL slightly resembles rspec.
     # team989.LoggingStubs.canMoveStub(target, ...)
     stub_call 'canMove', 'team989.LoggingStubs.canMoveStub'
     
+    # Replace the code marked with Stubs.canMove.logo in team989.LoggingStubs with the code marked
+    # Stubs.canMove.logoSource in test.stubs.LoggingStubs
+    #
+    # Note that team989.LoggingStubs was created by an earlier add_class directive.
+    replace_code 'team989.LoggingStubs', 'Stubs.canMove.logo',
+                 'test.stubs.LoggingStubs', 'Stubs.canMove.logoSource'
+    
     # Run a test match to check some conditions.
     match do
       it 'must win in any way' do
@@ -86,7 +93,7 @@ functionality available in a test suite. The suite DSL slightly resembles rspec.
     option 'bc.engine.upkeep', nil
 
 To prevent infinite recursion, stubbing should be disabled in the actual stubs. The stub
-implementation below demonstrates the syntax.
+implementation below demonstrates the syntax for stubbing and code replacement.
 
     package test.stubs;
     
@@ -97,10 +104,19 @@ implementation below demonstrates the syntax.
       //$ -stubs
       public static final boolean canMoveStub(RobotController target, Direction where) {
         boolean returnValue = target.canMove(where);
+        //$ +mark: Stubs.canMove.logo
+        System.out.println("This should not show up");
+        //$ -mark: Stubs.canMove.logo    
         System.out.println("canMove(" + where.toString() + ") -> " + returnValue);
         return returnValue;
       }
       //$ +stubs
+    
+      public static void markTest() {
+        //$ +mark: Stubs.canMove.logoSource
+        System.out.println("This should show up");
+        //$ -mark: Stubs.canMove.logo    
+      }
     }
 
 
