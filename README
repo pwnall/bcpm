@@ -112,8 +112,15 @@ On Ubuntu:
     sudo gem install rubygems-update
     sudo `gem env | grep 'EXECUTABLE DIRECTORY' | ruby -e "puts gets.split(': ', 2).last"`/update_rubygems
 
-On both OSX and Ubuntu:
-   
-    sudo gem install echoe flexmock
+On OSX:
+   Get git from http://code.google.com/p/git-osx-installer/
+
+On Windows:
+   Get git from http://code.google.com/p/msysgit/downloads/
+   Get ruby 1.8.7 (add it to your path) from http://rubyinstaller.org/downloads/
+
+On everything (skip the 'sudo' prefix on Windows though):
+    sudo gem install rake echoe
     git clone git@git.pwnb.us:six370/bcpm.git
+    cd bcpm
     rake install

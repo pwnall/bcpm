@@ -9,8 +9,7 @@ Echoe.new('bcpm') do |p|
   p.summary = 'Battlecode (MIT 6.370) package manager.'
   p.url = 'http://git.pwnb.us/six370'
   p.dependencies = []
-  p.development_dependencies = ['echoe >=3.2',
-                                'flexmock >=0.8.6']
+  p.development_dependencies = ['echoe >=3.2']
   
   p.need_tar_gz = !Gem.win_platform?
   p.need_zip = !Gem.win_platform?
