@@ -10,14 +10,33 @@ module Tests
 class CaseBase
   class <<self
     # Called before any code is evaluated in the class context.
-    def setup
+    def _setup
       @map = nil
       @vs = nil
-      @match = nil
+      @match = nil      
       @options = {}
+      @env = Bcpm::Tests::Environment.new
+      @env_used = false
+      
       @tests = []
       @environments = []
       @matches = []
+    end
+    
+    # Called after all code is evaluated in the class context.
+    def _post_eval
+      @environments << @env if @env_used
+      @env = nil
+      @options = nil
+    end
+    
+    # Called by public methods before they change the environment.
+    def _env_change
+      if @env_used
+        @environments << @env
+        @env = Bcpm::Tests::Environment.new
+        @env_used = false
+      end
     end
   
     # Set the map for following matches.
@@ -38,17 +57,32 @@ class CaseBase
         @options[key] = value
       end
     end
-  
-    # TODO(pwnall): patch data
+    
+    # Plugs a test class into the player code.
+    def add_class(target, source)
+      _env_change
+      @env.file_op [:file, target, source]
+    end
+
+    # Replaces a player class with a test class.
+    def replace_class(target, source)
+      _env_change
+      @env.file_op [:file, target, source]
+    end
+    
+    # Redirects all method calls using a method name to a static method.
+    def stub_call(source, target)
+      _env_change
+      @env.patch_op [:stub, target, source]
+    end
   
     # Create a test match. The block contains test cases for the match.
     def match(&block)
       begin
-        @match = Bcpm::Tests::TestMatch.new @vs, @map, @options
+        @env_used = true
+        @match = Bcpm::Tests::TestMatch.new @vs, @map, @env, @options
         self.class_eval(&block)
         @matches << @match
-        # TODO(pwnall): environment reuse
-        @environments << @match.environment
       ensure
         @match = nil
       end

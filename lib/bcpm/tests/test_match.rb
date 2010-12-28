@@ -25,12 +25,11 @@ class TestMatch
   attr_reader :data
 
   # Skeleton for a match.
-  def initialize(vs, map, options)
+  def initialize(vs, map, environment, options)
     @vs = vs
     @map = map
     @options = options.clone
-    # TODO(pwnall): environment reuse
-    @environment = Bcpm::Tests::Environment.new
+    @environment = environment
     @output = nil
     @data = nil
   end

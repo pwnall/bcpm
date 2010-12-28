@@ -31,6 +31,8 @@ module Player
   end
   
   # Downloads player code from a repository for one-time use, without linking it to the repository.
+  #
+  # Returns the path to the player on the local system.
   def self.checkpoint(repo_uri, repo_branch, local_name)
     old_name = player_name repo_uri
     local_path = File.join local_root, local_name
@@ -51,7 +53,7 @@ module Player
 
     Bcpm::Dist.add_player source_path
     configure local_path
-    local_name
+    local_path
   end
 
   # Undoes the effects of an install or checkpoint call.
@@ -116,7 +118,7 @@ module Player
     
     Dir.glob(File.join(new_source_dir, '**', '*.java')).each do |file|
       contents = File.read file
-      contents.gsub! /([^A-Za-z0-9_.])#{old_name}([^A-Za-z0-9_])/, "\\1#{new_name}\\2"
+      contents.gsub! /(^|[^A-Za-z0-9_.])#{old_name}([^A-Za-z0-9_]|$)/, "\\1#{new_name}\\2"
       File.open(file, 'w') { |f| f.write contents }
     end
     new_source_dir

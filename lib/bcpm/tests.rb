@@ -104,7 +104,33 @@ module Tests
       f.write eclipse_classpath(local_path)
     end
     config
-  end  
+  end
+  
+  # Extracts the path to a suite's source package given its repository.
+  #
+  # Args:
+  #   suite_path:: (optional) path to the suite's git repository on the local machine
+  def self.package_path(suite_path = nil)
+    suite_path ||= self.suite_path
+    
+    # All the packages should be in the 'src' directory.
+    source_dir = File.join suite_path, 'src'
+    unless File.exist? source_dir
+      puts "Missing src directory"
+      return nil
+    end
+    
+    # Ignore maintainance files/folder such as .gitignore / .svn.
+    package_dirs = Dir.glob(File.join(source_dir, '*')).
+                       reject { |path| File.basename(path)[0, 1] == '.' }
+    unless package_dirs.length == 1
+      puts "src directory doesn't contain exactly one package directory!"
+      return nil
+    end
+
+    package_dirs.first
+  end
+  
   
   # The contents of an Eclipse .classpath for a test suite.
   def self.eclipse_classpath(local_path)

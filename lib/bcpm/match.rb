@@ -41,9 +41,9 @@ module Match
       run_build_script build_file, conf_file, match_log, 'file'
       run_build_script build_file, conf_file, scribe_log, 'transcribe'
       
-      textlog = File.read txtfile
-      binlog = File.read binfile
-      antlog = File.read match_log
+      textlog = File.exist?(txtfile) ? File.read(txtfile) : ''
+      binlog = File.exist?(binfile) ? File.read(binfile) : ''
+      antlog = File.exist?(match_log) ? File.read(match_log) : ''
     end
     FileUtils.rm_rf tempdir
     

@@ -25,8 +25,9 @@ class Suite
     case_files.each do |file|
       code = File.read file
       klass = Class.new Bcpm::Tests::CaseBase
-      klass.setup
+      klass._setup
       klass.class_eval code, file
+      klass._post_eval
       @tests += klass.tests
       @matches += klass.matches
       @environments += klass.environments
