@@ -35,6 +35,75 @@ You'll need to import the project into Eclipse.
 
 You'll need to import the project into Eclipse, and setup a git repository for the player.
 
+
+TEST SUITES
+
+The test suite must have its Java code structured just like the player (one package under 'src'),
+and the recommended package name is 'test'. It must have a 'bcpm.yml' containing the name of the
+player that the tests are written against, structured as follows
+
+  ---
+  :target_player: team989
+
+The actual tests are .rb (Ruby) files in the 'suite' directory. The following example showcases the
+functionality available in a test suite. The suite DSL slightly resembles rspec.
+
+    # Set the opponent for future matches.
+    vs 'yield'
+    
+    # Set the map for future matches.
+    map 'venice'
+    
+    # Disable energon draining.
+    option 'bc.engine.upkeep', false
+    
+    # Replace a .java file in the player under test with a .java file in the test suite. 
+    replace_class 'team989.RobotPlayer', 'test.players.RobotPlayer'
+    
+    # Add a .java file in the test suite to the player under test.
+    add_class 'team989.LoggingStubs', 'test.stubs.LoggingStubs'
+    
+    # Re-route all calls that look like target.canMove(...) to
+    # team989.LoggingStubs.canMoveStub(target, ...)
+    stub_call 'canMove', 'team989.LoggingStubs.canMoveStub'
+    
+    # Run a test match to check some conditions.
+    match do
+      it 'must win in any way' do
+        should_win
+      end
+    
+      it "shouldn't leak exceptions" do
+        should_not_throw
+      end
+      
+      it 'should fail' do
+        fail
+      end
+    end
+    
+    # Reset energon draining option to its default value.
+    option 'bc.engine.upkeep', nil
+
+To prevent infinite recursion, stubbing should be disabled in the actual stubs. The stub
+implementation below demonstrates the syntax.
+
+    package test.stubs;
+    
+    import battlecode.common.Direction;
+    import battlecode.common.RobotController;
+    
+    public class LoggingStubs {
+      //$ -stubs
+      public static final boolean canMoveStub(RobotController target, Direction where) {
+        boolean returnValue = target.canMove(where);
+        System.out.println("canMove(" + where.toString() + ") -> " + returnValue);
+        return returnValue;
+      }
+      //$ +stubs
+    }
+
+
 INSTALLATION
 
 On Ubuntu:

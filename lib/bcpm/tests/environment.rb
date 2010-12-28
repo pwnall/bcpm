@@ -59,7 +59,9 @@ class Environment
       target.sub! /^#{@test_player}./, "#{@player_name}."
       eff_source = source.sub /^#{@test_player}./, "#{@player_name}."
 
-      contents = File.read java_path(@test_src, eff_source)
+      file_path = java_path(@test_src, eff_source)
+      next unless File.exist?(file_path)
+      contents = File.read file_path
       
       source_pkg = java_package(source)
       eff_source_pkg = java_package(eff_source)
@@ -77,7 +79,9 @@ class Environment
         contents.gsub! /(^|[^A-Za-z0-9_])#{source_class}([^A-Za-z0-9_]|$)/, "\\1#{target_class}\\2"
       end
       
-      File.open(java_path(@player_src, target), 'w') { |f| f.write contents }
+      file_path = java_path(@player_src, target)
+      next unless File.exist?(File.dirname(file_path))
+      File.open(file_path, 'w') { |f| f.write contents }
     end
   end
   

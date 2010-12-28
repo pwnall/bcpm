@@ -1,3 +1,5 @@
+v0.7.1. Fix crashes due to invalid paths in test case directives.
+
 v0.7. Player source patching.
 
 v0.6.3. Bugfix in match replay.
