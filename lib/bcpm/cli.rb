@@ -24,7 +24,7 @@ module CLI
         puts "Please supply the path to the player repository!"
         exit 1
       end 
-      Bcpm::Player.install args[1], args[2]
+      exit 1 unless Bcpm::Player.install(args[1], args[2])
     when 'new'  # Create a new player project using an existing project as a template.
       unless Bcpm::Dist.installed?
         puts "Please install a battlecode distribution first!"
@@ -34,7 +34,7 @@ module CLI
         puts "Please supply the new player name, and the path to the template player repository!"
         exit 1
       end 
-      Bcpm::Player.checkpoint args[2], 'master', args[1]
+      exit 1 unless Bcpm::Player.checkpoint(args[2], 'master', args[1])
     when 'uninstall', 'remove'  # Remove a player project from the workspace.
       if args.length < 2
         puts "Please supply the player name!"

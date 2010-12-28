@@ -7,7 +7,7 @@ module Bcpm
 module Player
   # Clones a player code from a repository, and sets it up for development on the local machine.
   #
-  # Returns the player's name.
+  # Returns the player's name, or nil if something went wrong.
   def self.install(repo_uri, repo_branch)
     repo_branch ||= 'master'
 
@@ -15,14 +15,14 @@ module Player
     local_path = File.join local_root, name    
     if File.exist?(local_path)
       puts "Player already installed at #{local_path}!"
-      exit 1
+      return nil
     end    
-    Bcpm::Git.clone_repo repo_uri, repo_branch, local_path
+    return nil unless Bcpm::Git.clone_repo(repo_uri, repo_branch, local_path)
     
     unless source_path = package_path(local_path)
-      puts "Repository doesn't seem to contain a player!"
+      puts "Repository #{repo_uri} doesn't seem to contain a player!"
       FileUtils.rm_rf local_path      
-      exit 1
+      return nil
     end
         
     Bcpm::Dist.add_player source_path
@@ -32,23 +32,23 @@ module Player
   
   # Downloads player code from a repository for one-time use, without linking it to the repository.
   #
-  # Returns the path to the player on the local system.
+  # Returns the path to the player on the local system, or nil if something went wrong.
   def self.checkpoint(repo_uri, repo_branch, local_name)
     old_name = player_name repo_uri
     local_path = File.join local_root, local_name
     if File.exist?(local_path)
       puts "Player already installed at #{local_path}!"
-      exit 1
+      return nil
     end
     if old_name == repo_uri
-      Bcpm::Git.checkpoint_local_repo File.join(local_root, old_name), local_path
+      return nil unless Bcpm::Git.checkpoint_local_repo(File.join(local_root, old_name), local_path)
     else
-      Bcpm::Git.checkpoint_repo repo_uri, repo_branch, local_path
+      return nil unless Bcpm::Git.checkpoint_repo(repo_uri, repo_branch, local_path)
     end
     unless source_path = rename(local_path, old_name)
-      puts "Repository doesn't seem to contain a player!"
+      puts "Repository #{repo_uri} doesn't seem to contain a player!"
       FileUtils.rm_rf local_path      
-      exit 1
+      return nil
     end
 
     Bcpm::Dist.add_player source_path
@@ -57,11 +57,15 @@ module Player
   end
 
   # Undoes the effects of an install or checkpoint call.
+  #
+  # Returns true for success, or false if something went wrong.
   def self.uninstall(local_name)
     local_path = File.join local_root, local_name
     source_path = package_path local_path
-    Bcpm::Dist.remove_player source_path
+    Bcpm::Dist.remove_player source_path if source_path
+    return false unless File.exist? local_path    
     FileUtils.rm_rf local_path
+    true
   end
   
   # Re-configures a player's source code project.

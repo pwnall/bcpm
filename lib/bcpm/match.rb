@@ -1,5 +1,6 @@
 require 'English'
 require 'shellwords'
+require 'tmpdir'
 
 # :nodoc: namespace
 module Bcpm
@@ -20,7 +21,8 @@ module Match
   #   map_name:: name of map .xml file
   #   bc_options:: hash of simulator settings to be added to bc.conf
   def self.match_data(player1_name, player2_name, map_name, bc_options = {})
-    tempdir = tempfile
+    uid = tempfile
+    tempdir = File.join Dir.tmpdir, uid
     Dir.mkdir tempdir
     textlog, binlog, antlog = nil, nil, nil
     Dir.chdir tempdir do
@@ -46,7 +48,7 @@ module Match
     end
     FileUtils.rm_rf tempdir
     
-    { :ant => extract_ant_log(antlog), :rms => binlog, :script => textlog, :uid => tempdir }
+    { :ant => extract_ant_log(antlog), :rms => binlog, :script => textlog, :uid => uid }
   end
   
   # Replays a match using the binlog (.rms file).

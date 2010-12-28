@@ -16,6 +16,7 @@ class Environment
   # Creates a new environment blueprint.
   def initialize
     @player_name = self.class.new_player_name
+    @available = false
     @file_ops = [] 
     @patch_ops = []
   end
@@ -26,19 +27,33 @@ class Environment
   #   player_source_path_or_uri:: name or git uri for the player source code
   #   branch:: branch in git repository to be checked out
   def setup(player_source_path_or_uri, branch)
-    @player_path = Bcpm::Player.checkpoint player_source_path_or_uri, branch, player_name
-    @player_src = Bcpm::Player.package_path @player_path
-    
-    @test_player = Bcpm::Tests.target_player
-    @test_src = Bcpm::Tests.package_path
-    
-    file_ops
-    patch_ops
+    begin
+      @player_path = Bcpm::Player.checkpoint player_source_path_or_uri, branch, player_name      
+      raise "Failed to checkout player #{player_source_path_or_uri}" unless @player_path
+      @player_src = Bcpm::Player.package_path(@player_path)
+      
+      @test_player = Bcpm::Tests.target_player
+      @test_src = Bcpm::Tests.package_path
+      
+      file_ops
+      patch_ops
+    rescue Exception => e
+      print "Failed setting up test environment! Some tests will not run!\n"
+      print "#{e.class.name}: #{e.to_s}\n#{e.backtrace.join("\n")}\n\n"
+      return false
+    end
+    @available = true    
+  end
+  
+  # True if the environment has been setup and can be used to run tests.
+  def available? 
+    @available
   end
   
   # Undoes the effects of setup.
   def teardown
     Bcpm::Player.uninstall player_name
+    @available = false
   end
   
   # Queue an operation that adds a file.

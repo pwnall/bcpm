@@ -26,7 +26,7 @@ module Tests
   
   # Runs the test suite against a player codebase.
   def self.run(player_name_or_uri, branch = 'master')
-    suite = new_suite    
+    suite = new_suite
     suite.environments.each { |e| e.setup player_name_or_uri, branch }
     suite.run
     suite.environments.each { |e| e.teardown }
@@ -36,7 +36,9 @@ module Tests
   # Creates a Suite instance for running all the tests.
   def self.new_suite
     files = Dir.glob File.join(suite_path, 'suite', '**', '*.rb')
-    Bcpm::Tests::Suite.new files
+    suite = Bcpm::Tests::Suite.new
+    suite.add_cases files
+    suite
   end
 
   # True if a battlecode distribution is installed on the local machine.
