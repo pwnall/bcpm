@@ -42,7 +42,7 @@ class Suite
       failure_string = nil
       begin
         if failure = test.check_output
-          failure_string = "#{failure.to_s}\n#{failure.backtrace.join("\n")}"
+          failure_string = "#{failure.to_s}\n#{failure.short_backtrace.join("\n")}"
           fails += 1
           print 'F'
         else
