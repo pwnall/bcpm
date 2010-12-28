@@ -1,4 +1,6 @@
-v0.5.2. Match reuse.
+v0.5.3. Improved and bugfixed basic assertions.
+
+v0.5.2. Match reuse for faster tests.
 
 v0.5.1. Removed Ant garbage from output.
 

@@ -8,8 +8,8 @@ module Tests
 module Assertions  
   # Fails unless the match was won.
   def should_win
-    return match.output_lines[-3].index(' (A) wins')
-    raise Bcpm::Tests::AssertionError, 'Player was expected to win, but lost'
+    return if match.output_lines[-3].index(' (A) wins')
+    raise Bcpm::Tests::AssertionError, 'Player was expected to win, but lost!'
   end
 
   # Fails unless the match was won, and the Reason: line includes the argument text. 
@@ -23,9 +23,9 @@ module Assertions
 
   # Fails if the player code threw any exception.
   def should_not_throw
-    if match.output.index(/^(\S*)Exception:/)
-      raise Bcpm::Tests::AssertionError, "Player should not have thrown exceptions. " +
-          "It threw #{$1}Exception"
+    if match.output.index(/^(\S*)Exception:(.*?)\n\S/m)
+      raise Bcpm::Tests::AssertionError, "Player should not have thrown exceptions! " +
+          "It threw #{$1}Exception:#{$2}"
     end
   end
 end
