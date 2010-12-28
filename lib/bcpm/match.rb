@@ -34,7 +34,6 @@ module Match
       bc_config.merge! bc_options
       conf_file = File.join filebase, 'bc.conf'      
       write_config conf_file, bc_config
-      write_ui_config conf_file, bc_config
       build_file = File.join filebase, 'build.xml'
       write_build build_file, conf_file
       
@@ -61,6 +60,7 @@ module Match
       bc_config = simulator_config(nil, nil, nil, binfile, nil)
       conf_file = File.join filebase, 'bc.conf'      
       write_config conf_file, bc_config      
+      write_ui_config conf_file, bc_config
       build_file = File.join filebase, 'build.xml'
       write_build build_file, conf_file
       
@@ -119,7 +119,7 @@ choice=FILE
 save=false
 save-file=
 host=
-file=#{options['bc.server.save-file']},
+file=#{options['bc.server.save-file']}
 analyzeFile=false
 glclient=#{options['bc.client.opengl'] || 'false'}
 showMinimap=false
