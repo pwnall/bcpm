@@ -28,6 +28,11 @@ module Assertions
           "It threw #{$1}Exception:#{$2}"
     end
   end
+  
+  # Always fails. Useful for obtaining the game log.
+  def fail
+    raise Bcpm::Tests::AssertionError, 'Test case called fail!'
+  end
 end
 
 end  # namespace Bcpm::Tests

@@ -19,6 +19,8 @@ module Dist
       return
     end
     File.unlink team_path
+    bin_path = File.join dist_path, 'bin', File.basename(player_path)
+    FileUtils.rm_rf bin_path if File.exist?(bin_path)
   end
   
   # Upgrades the installed battlecode distribution to the latest version.
