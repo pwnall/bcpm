@@ -1,3 +1,5 @@
+v0.6. Match replay. Failed tests dump replay and output info, to aid debugging.
+
 v0.5.3. Improved and bugfixed basic assertions.
 
 v0.5.2. Match reuse for faster tests.

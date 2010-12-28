@@ -58,6 +58,16 @@ module CLI
       end
       output = Bcpm::Match.run args[1], args[2], args[3]
       puts output
+    when 'replay'  # Replay a match using its binlog (.rms file).
+      unless Bcpm::Dist.installed?
+        puts "Please install a battlecode distribution first!"
+        exit 1
+      end
+      if args.length < 2
+        puts "Please supply the path to the match binlog (.rms file)!"
+        exit 1
+      end
+      Bcpm::Match.replay args[1]
     when 'test'
       unless Bcpm::Tests.installed?
         puts "Please install a test suite first!"
