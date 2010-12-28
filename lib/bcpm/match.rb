@@ -16,8 +16,7 @@ module Match
   def self.match_data(player1_name, player2_name, map_name)
     tempdir = tempfile
     Dir.mkdir tempdir
-    textlog = nil
-    antlog = nil
+    textlog, binlog, antlog = nil, nil, nil
     Dir.chdir tempdir do
       filebase = Dir.pwd
       binfile = File.join filebase, 'match.rms'
@@ -35,11 +34,12 @@ module Match
       run_build_script build_file, conf_file, scribe_log, 'transcribe'
       
       textlog = File.read txtfile
+      binlog = File.read binfile
       antlog = File.read match_log
     end
     FileUtils.rm_rf tempdir
     
-    { :ant => extract_ant_log(antlog), :script => textlog }
+    { :ant => extract_ant_log(antlog), :rms => binlog, :script => textlog, :uid => tempdir }
   end
   
   # Options to be overridden for the battlecode simulator.

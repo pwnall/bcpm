@@ -18,6 +18,9 @@ class TestMatch
 
   # Match output. Nil if the match hasn't completed.
   attr_reader :output
+  
+  # Detailed match data.
+  attr_reader :data
 
   # Skeleton for a match.
   def initialize(vs, map)
@@ -26,12 +29,13 @@ class TestMatch
     # TODO(pwnall): environment reuse
     @environment = Bcpm::Tests::Environment.new
     @output = nil
+    @data = nil
   end
   
   # Run the game.
   def run
-    output_data = Bcpm::Match.match_data @environment.player_name, @vs, @map
-    @output = output_data[:ant]
+    @data = Bcpm::Match.match_data @environment.player_name, @vs, @map
+    @output = data[:ant]
   end
 
   # True if the test match has run, and its results are available.
