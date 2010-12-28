@@ -1,3 +1,5 @@
+v0.6.2. Battlecode options in tests.
+
 v0.6.1. Short trace for failed tests.
 
 v0.6. Match replay. Failed tests dump replay and output info, to aid debugging.

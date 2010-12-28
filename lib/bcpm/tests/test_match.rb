@@ -12,6 +12,8 @@ class TestMatch
   attr_reader :vs  
   # Name of map for the match.
   attr_reader :map
+  # Custom options for the battlecode simulator.
+  attr_reader :options
   
   # The environment that the match runs in.
   attr_reader :environment
@@ -23,9 +25,10 @@ class TestMatch
   attr_reader :data
 
   # Skeleton for a match.
-  def initialize(vs, map)
+  def initialize(vs, map, options)
     @vs = vs
     @map = map
+    @options = options.clone
     # TODO(pwnall): environment reuse
     @environment = Bcpm::Tests::Environment.new
     @output = nil
@@ -34,7 +37,7 @@ class TestMatch
   
   # Run the game.
   def run
-    @data = Bcpm::Match.match_data @environment.player_name, @vs, @map
+    @data = Bcpm::Match.match_data @environment.player_name, @vs, @map, @options
     @output = data[:ant]
   end
 
@@ -45,7 +48,11 @@ class TestMatch
 
   # User-readable description of match conditions.
   def description
-    "vs #{vs} on #{map}"
+    desc = "vs #{vs} on #{map}"
+    unless @options.empty?
+      desc += ' with ' + options.map { |k, v| "#{k}=#{v}" }.join(",")
+    end
+    desc
   end
     
   # The match output, split into lines.

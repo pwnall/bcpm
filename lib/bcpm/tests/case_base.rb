@@ -14,6 +14,7 @@ class CaseBase
       @map = nil
       @vs = nil
       @match = nil
+      @options = {}
       @tests = []
       @environments = []
       @matches = []
@@ -28,13 +29,22 @@ class CaseBase
     def vs(player_name)
       @vs = player_name.dup.to_s
     end
+    
+    # Set a simulation option.
+    def option(key, value)
+      if value.nil?
+        @options.delete key
+      else
+        @options[key] = value
+      end
+    end
   
     # TODO(pwnall): patch data
   
     # Create a test match. The block contains test cases for the match.
     def match(&block)
       begin
-        @match = Bcpm::Tests::TestMatch.new @vs, @map
+        @match = Bcpm::Tests::TestMatch.new @vs, @map, @options
         self.class_eval(&block)
         @matches << @match
         # TODO(pwnall): environment reuse

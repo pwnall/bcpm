@@ -13,7 +13,13 @@ module Match
   end
   
   # Runs a match between two players and returns the log data.
-  def self.match_data(player1_name, player2_name, map_name)
+  #
+  # Args:
+  #   player1_name:: name of locally installed player (A)
+  #   player2_name:: name of locally installed player (B)
+  #   map_name:: name of map .xml file
+  #   bc_options:: hash of simulator settings to be added to bc.conf
+  def self.match_data(player1_name, player2_name, map_name, bc_options = {})
     tempdir = tempfile
     Dir.mkdir tempdir
     textlog, binlog, antlog = nil, nil, nil
@@ -25,6 +31,7 @@ module Match
       scribe_log = File.join filebase, 'scribe.log' 
 
       bc_config = simulator_config(player1_name, player2_name, map_name, binfile, txtfile)
+      bc_config.merge! bc_options
       conf_file = File.join filebase, 'bc.conf'      
       write_config conf_file, bc_config
       build_file = File.join filebase, 'build.xml'
@@ -52,7 +59,7 @@ module Match
 
       bc_config = simulator_config(nil, nil, nil, binfile, nil)
       conf_file = File.join filebase, 'bc.conf'      
-      write_config conf_file, bc_config
+      write_config conf_file, bc_config      
       build_file = File.join filebase, 'build.xml'
       write_build build_file, conf_file
       
@@ -67,6 +74,11 @@ module Match
       'bc.engine.silence-a' => false,
       'bc.engine.silence-b' => true,
       'bc.dialog.skip' => true,
+      
+      # Healthy production defaults.
+      'bc.engine.breakpoints' => false,
+      'bc.engine.debug-methods' => false,
+      'bc.engine.upkeep' => true
     }
     config['bc.game.maps'] = map_name if map_name
     config['bc.game.team-a'] = player1_name if player1_name

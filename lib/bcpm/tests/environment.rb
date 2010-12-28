@@ -33,9 +33,10 @@ class Environment
   
   # A player name guaranteed to be unique across the systme.
   def self.new_player_name
+    @prefix ||= "test_#{(Time.now.to_f * 1000).to_i}_#{$PID}"
     @counter ||= 0
     @counter += 1
-    "test_#{(Time.now.to_f * 1000).to_i}_#{$PID}_#{@counter}"
+    "#{@prefix}_#{@counter}"
   end
 end  # class Bcpm::Tests::TestMatch
 
