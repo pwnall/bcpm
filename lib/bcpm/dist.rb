@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'shellwords'
 
 # :nodoc: namespace
 module Bcpm
@@ -8,17 +9,28 @@ module Dist
   # Hooks a player's code into the installed battlecode distribution.
   def self.add_player(player_path)
     team_path = File.join dist_path, 'teams', File.basename(player_path)
-    FileUtils.ln_s player_path, team_path
+    if /mingw/ =~ RUBY_PLATFORM || (/win/ =~ RUBY_PLATFORM && /darwin/ !~ RUBY_PLATFORM)
+      command = Shellwords.shelljoin(['cmd', '/C', 'mklink', '/D', team_path.gsub('/', '\\'),
+                                      player_path.gsub('/', '\\')])
+      Kernel.`(command)
+    else
+      FileUtils.ln_s player_path, team_path
+    end
   end
 
   # Unhooks a player's code from the installed battlecode distribution.
   def self.remove_player(player_path)
     team_path = File.join dist_path, 'teams', File.basename(player_path)
-    unless File.exist?(team_path) && File.symlink?(team_path) &&
-           File.readlink(team_path) == player_path   
-      return
+    if /mingw/ =~ RUBY_PLATFORM || (/win/ =~ RUBY_PLATFORM && /darwin/ !~ RUBY_PLATFORM)
+      return unless File.exist?(team_path)
+      Dir.rmdir team_path
+    else
+      unless File.exist?(team_path) && File.symlink?(team_path) &&
+             File.readlink(team_path) == player_path   
+        return
+      end
+      File.unlink team_path
     end
-    File.unlink team_path
     bin_path = File.join dist_path, 'bin', File.basename(player_path)
     FileUtils.rm_rf bin_path if File.exist?(bin_path)
   end

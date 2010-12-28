@@ -1,3 +1,5 @@
+v0.7.2. Windows compatibility.
+
 v0.7.1. Fixed crashes due to invalid paths in test case directives.
 
 v0.7. Player source patching.

@@ -113,14 +113,20 @@ On Ubuntu:
     sudo `gem env | grep 'EXECUTABLE DIRECTORY' | ruby -e "puts gets.split(': ', 2).last"`/update_rubygems
 
 On OSX:
+
    Get git from http://code.google.com/p/git-osx-installer/
 
-On Windows:
+On Windows 7+:
+
    Get git from http://code.google.com/p/msysgit/downloads/
    Get ruby 1.8.7 (add it to your path) from http://rubyinstaller.org/downloads/
+   Get ant from http://code.google.com/p/winant/
 
 On everything (skip the 'sudo' prefix on Windows though):
+
     sudo gem install rake echoe
     git clone git@git.pwnb.us:six370/bcpm.git
     cd bcpm
     rake install
+
+You'll need an administrative shell on Windows.

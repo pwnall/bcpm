@@ -40,9 +40,9 @@ module Match
       run_build_script build_file, conf_file, match_log, 'file'
       run_build_script build_file, conf_file, scribe_log, 'transcribe'
       
-      textlog = File.exist?(txtfile) ? File.read(txtfile) : ''
-      binlog = File.exist?(binfile) ? File.read(binfile) : ''
-      antlog = File.exist?(match_log) ? File.read(match_log) : ''
+      textlog = File.exist?(txtfile) ? File.open(txtfile, 'rb') { |f| f.read } : ''
+      binlog = File.exist?(binfile) ? File.open(binfile, 'rb') { |f| f.read } : ''
+      antlog = File.exist?(match_log) ? File.open(match_log, 'rb') { |f| f.read } : ''
     end
     FileUtils.rm_rf tempdir
     
@@ -95,7 +95,7 @@ module Match
   # Writes a patched buildfile that references the given configuration file.
   def self.write_build(buildfile, conffile)
     contents = Bcpm::Player.ant_config conffile
-    File.open(buildfile, 'w') { |f| f.write contents }
+    File.open(buildfile, 'wb') { |f| f.write contents }
   end
   
   # Writes a cleaned up battlecode simulator configuration file.
@@ -106,20 +106,30 @@ module Match
       options.has_key? key
     end
     lines += options.map { |key, value| "#{key}=#{value}" }
-    File.open(conffile, 'w') { |f| f.write lines.join("\n") + "\n" }
+    File.open(conffile, 'wb') { |f| f.write lines.join("\n") + "\n" }
   end
   
   # Writes the configuration for the battlecode UI.
   #
   # This is a singleton file, so only one client should run at a time.
   def self.write_ui_config(conffile, options = {})
-    File.open(File.expand_path('~/.battlecode.ui'), 'w') do |f|
+    save_path = options['bc.server.save-file'] || ''
+    if /mingw/ =~ RUBY_PLATFORM || (/win/ =~ RUBY_PLATFORM && /darwin/ !~ RUBY_PLATFORM)
+      save_path = save_path.dup
+      save_path.gsub! '\\', '\\\\\\\\'
+      save_path.gsub! '/', '\\\\\\\\'
+      if save_path[1, 2] == ':\\'
+        save_path[1, 2] = '\\:\\'
+      end
+    end
+    
+    File.open(File.expand_path('~/.battlecode.ui'), 'wb') do |f|
       f.write <<END_CONFIG
 choice=FILE
 save=false
 save-file=
 host=
-file=#{options['bc.server.save-file']}
+file=#{save_path}
 analyzeFile=false
 glclient=#{options['bc.client.opengl'] || 'false'}
 showMinimap=false

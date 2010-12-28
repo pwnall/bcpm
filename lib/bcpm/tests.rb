@@ -96,11 +96,11 @@ module Tests
     return nil unless config = configuration(local_path)
     Bcpm::Config[:test_target_player] = config[:target_player]
     
-    File.open File.join(local_path, '.project'), 'w' do |f|
+    File.open File.join(local_path, '.project'), 'wb' do |f|
       f.write eclipse_project(local_path)
     end
     
-    File.open File.join(local_path, '.classpath'), 'w' do |f|
+    File.open File.join(local_path, '.classpath'), 'wb' do |f|
       f.write eclipse_classpath(local_path)
     end
     config

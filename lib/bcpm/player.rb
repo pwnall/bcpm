@@ -72,15 +72,15 @@ module Player
 
   # Configures a player's source code project.
   def self.configure(local_path)
-    File.open File.join(local_path, '.project'), 'w' do |f|
+    File.open File.join(local_path, '.project'), 'wb' do |f|
       f.write eclipse_project(local_path)
     end
     
-    File.open File.join(local_path, '.classpath'), 'w' do |f|
+    File.open File.join(local_path, '.classpath'), 'wb' do |f|
       f.write eclipse_classpath(local_path)
     end
     
-    File.open File.join(local_path, 'build.xml'), 'w' do |f|
+    File.open File.join(local_path, 'build.xml'), 'wb' do |f|
       f.write ant_config('bc.conf')
     end
   end
@@ -119,7 +119,7 @@ module Player
     Dir.glob(File.join(new_source_dir, '**', '*.java')).each do |file|
       contents = File.read file
       contents.gsub! /(^|[^A-Za-z0-9_.])#{old_name}([^A-Za-z0-9_]|$)/, "\\1#{new_name}\\2"
-      File.open(file, 'w') { |f| f.write contents }
+      File.open(file, 'wb') { |f| f.write contents }
     end
     new_source_dir
   end

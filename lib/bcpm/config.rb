@@ -32,7 +32,7 @@ module Config
   
   # Writes the configuration to the YAML file.
   def self.write_config
-    File.open(config_file, 'w') { |f| YAML.dump config, f }
+    File.open(config_file, 'wb') { |f| YAML.dump config, f }
   end
 
   # Path to the configuration YAML file.

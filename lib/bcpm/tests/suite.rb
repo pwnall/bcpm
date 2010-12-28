@@ -1,3 +1,5 @@
+require 'tmpdir'
+
 # :nodoc: namespace
 module Bcpm
 
@@ -63,11 +65,11 @@ class Suite
     failures.each_with_index do |failure, i|
       test, string = *failure
       print "#{'%3d' % (i + 1)}) Failed #{test.description}\n"
-      
-      txt_path = File.join '/tmp', test.match.data[:uid] + '.txt'
-      File.open(txt_path, 'w') { |f| f.write test.match.output }
-      rms_path = File.join '/tmp', test.match.data[:uid] + '.rms'
-      File.open(rms_path, 'w') { |f| f.write test.match.data[:rms] }
+            
+      txt_path = File.join Dir.tmpdir, test.match.data[:uid] + '.txt'
+      File.open(txt_path, 'wb') { |f| f.write test.match.output }
+      rms_path = File.join Dir.tmpdir, test.match.data[:uid] + '.rms'
+      File.open(rms_path, 'wb') { |f| f.write test.match.data[:rms] }
       
       print "Output: open #{txt_path}\nReplay: bcpm replay #{rms_path}\n"
       print "#{string}\n\n"

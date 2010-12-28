@@ -81,7 +81,7 @@ class Environment
       
       file_path = java_path(@player_src, target)
       next unless File.exist?(File.dirname(file_path))
-      File.open(file_path, 'w') { |f| f.write contents }
+      File.open(file_path, 'wb') { |f| f.write contents }
     end
   end
   
@@ -123,7 +123,7 @@ class Environment
         end
       end
       contents = lines.join("\n")
-      File.open(file, 'w') { |f| f.write contents } unless contents == old_contents
+      File.open(file, 'wb') { |f| f.write contents } unless contents == old_contents
     end
   end
   
