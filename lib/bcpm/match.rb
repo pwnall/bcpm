@@ -34,6 +34,7 @@ module Match
       bc_config.merge! bc_options
       conf_file = File.join filebase, 'bc.conf'      
       write_config conf_file, bc_config
+      write_ui_config conf_file, bc_config
       build_file = File.join filebase, 'build.xml'
       write_build build_file, conf_file
       
@@ -63,7 +64,7 @@ module Match
       build_file = File.join filebase, 'build.xml'
       write_build build_file, conf_file
       
-      run_build_script build_file, conf_file, match_log, 'run', false
+      run_build_script build_file, conf_file, match_log, 'run'
     end
     FileUtils.rm_rf tempdir
   end
@@ -74,6 +75,8 @@ module Match
       'bc.engine.silence-a' => false,
       'bc.engine.silence-b' => true,
       'bc.dialog.skip' => true,
+      'bc.server.throttle' => 'yield',
+      'bc.server.throttle-count' => 100000,
       
       # Healthy production defaults.
       'bc.engine.breakpoints' => false,
@@ -88,7 +91,7 @@ module Match
     config['bc.server.transcribe-output'] = txtfile if txtfile
     config
   end
-  
+    
   # Writes a patched buildfile that references the given configuration file.
   def self.write_build(buildfile, conffile)
     contents = Bcpm::Player.ant_config conffile
@@ -106,8 +109,31 @@ module Match
     File.open(conffile, 'w') { |f| f.write lines.join("\n") + "\n" }
   end
   
+  # Writes the configuration for the battlecode UI.
+  #
+  # This is a singleton file, so only one client should run at a time.
+  def self.write_ui_config(conffile, options = {})
+    File.open(File.expand_path('~/.battlecode.ui'), 'w') do |f|
+      f.write <<END_CONFIG
+choice=FILE
+save=false
+save-file=
+host=
+file=#{options['bc.server.save-file']},
+analyzeFile=false
+glclient=#{options['bc.client.opengl'] || 'false'}
+showMinimap=false
+MAP=#{options['bc.game.maps']}
+maps=#{options['bc.game.maps']}
+TEAM_A=#{options['bc.game.team-a']}
+TEAM_B=#{options['bc.game.team-b']}
+lockstep=false
+END_CONFIG
+    end
+  end
+  
   # Runs the battlecode Ant script.
-  def self.run_build_script(build_file, conf_file, log_file, target, quiet = true)
+  def self.run_build_script(build_file, conf_file, log_file, target)
     command = Shellwords.shelljoin(['ant', '-noinput', '-buildfile', build_file,
         '-Dbcconf=' + conf_file, '-logfile', log_file, target])
     Kernel.`(command)
