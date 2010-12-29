@@ -14,11 +14,20 @@ class Environment
   attr_reader :player_name
 
   # Creates a new environment blueprint.
-  def initialize
-    @player_name = self.class.new_player_name
-    @available = false
+  #
+  # Args:
+  #   prebuilt_name:: if given, the created blueprint points to an already-built environment
+  def initialize(prebuilt_name = nil)
     @file_ops = [] 
     @patch_ops = []
+
+    if prebuilt_name
+      @player_name = prebuilt_name
+      @available = true
+    else
+      @player_name = self.class.new_player_name
+      @available = false
+    end
   end
   
   # Puts together an environment according to the blueprint.
@@ -27,6 +36,7 @@ class Environment
   #   player_source_path_or_uri:: name or git uri for the player source code
   #   branch:: branch in git repository to be checked out
   def setup(player_source_path_or_uri, branch)
+    return true if @available
     begin
       @player_path = Bcpm::Player.checkpoint player_source_path_or_uri, branch, player_name      
       raise "Failed to checkout player #{player_source_path_or_uri}" unless @player_path

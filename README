@@ -47,8 +47,12 @@ If you go this route, you will have to create the git repositories yourself, and
 7. Run a game against some other player code.
 
     bcpm match yield team000 venice
+
+8. Remove the installed player. (removing the project folder is not enough!)
+
+    bcpm uninstall yield
     
-8. Create a new player from an existing template.
+9. Create a new player from an existing template.
 
    bcpm copy myplayer git@git.pwnb.us:six370/yield.git
 

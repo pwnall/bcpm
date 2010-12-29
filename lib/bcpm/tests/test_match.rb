@@ -1,3 +1,5 @@
+require 'tmpdir'
+
 # :nodoc: namespace
 module Bcpm
 
@@ -25,7 +27,7 @@ class TestMatch
   attr_reader :data
 
   # Skeleton for a match.
-  def initialize(vs, map, environment, options)
+  def initialize(vs, map, environment, options = {})
     @vs = vs
     @map = map
     @options = options.clone
@@ -57,6 +59,31 @@ class TestMatch
   # The match output, split into lines.
   def output_lines
     @output_lines ||= output.split("\n")
+  end
+  
+  # Stashes the match data somewhere on the system.
+  #
+  # Returns a string containing user-friendly instructions for accessing the match data.
+  def stash_data
+    txt_path = File.join Dir.tmpdir, data[:uid] + '.txt'
+    File.open(txt_path, 'wb') { |f| f.write output } unless File.exist?(txt_path)
+    rms_path = File.join Dir.tmpdir, data[:uid] + '.rms'
+    File.open(rms_path, 'wb') { |f| f.write data[:rms] }  unless File.exist?(rms_path)
+  
+    "Output: #{open_binary} #{txt_path}\nReplay: bcpm replay #{rms_path}\n"  
+  end  
+
+  # Name of program for opening text files.
+  def open_binary
+    return ENV['EDITOR'] if ENV['EDITOR']
+    case RUBY_PLATFORM
+    when /darwin/
+      'open'
+    when /win/
+      'notepad'
+    when /linux/
+      'gedit'
+    end
   end
 end  # class Bcpm::Tests::TestMatch
 

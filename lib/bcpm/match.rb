@@ -9,8 +9,10 @@ module Bcpm
 module Match
   # Runs a match between two players.
   def self.run(player1_name, player2_name, map_name)
-    data = match_data player1_name, player2_name, map_name
-    data[:ant]
+    env = Bcpm::Tests::Environment.new player1_name
+    match = Bcpm::Tests::TestMatch.new player2_name, map_name, env
+    match.run
+    match.stash_data
   end
   
   # Runs a match between two players and returns the log data.
