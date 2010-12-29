@@ -1,3 +1,5 @@
+require 'yaml'
+
 # :nodoc: namespace
 module Bcpm
 
@@ -12,8 +14,9 @@ module Tests
     configure suite_path
   end
   
-  # Installs the latest test suite.
-  def self.install
+  # Installs a test suite from a git repository.
+  def self.install(repo_uri = nil)
+    repo_uri ||= self.repo_uri
     Bcpm::Git.clone_repo repo_uri, 'master', suite_path
 
     unless configure(suite_path) && File.exist?(File.join(suite_path, 'suite'))
@@ -22,6 +25,19 @@ module Tests
     end    
     Bcpm::Config[:tests_repo_uri] = repo_uri
     Bcpm::Config[:tests_path] = suite_path
+  end
+  
+  # Creates a test suite from the built-in template, and sets it as the default suite.
+  def self.create(local_name, target_player)
+    local_path = File.join File.dirname(suite_path), local_name
+    if File.exist? local_path
+      puts "Player or suite already exists at #{local_path}!"
+      return nil
+    end
+    
+    write_template local_path, target_player
+    configure local_path
+    Bcpm::Config[:tests_path] = local_path
   end
   
   # Runs the test suite against a player codebase.
@@ -193,6 +209,54 @@ END_CONFIG
 END_CONFIG
   end  
 
+  # Writes the built-in suite template.
+  def self.write_template(local_path, target_player)
+    src_path = File.join local_path, 'src', 'test', 'players'
+    FileUtils.mkdir_p src_path
+    File.open File.join(src_path, 'RobotPlayer.java'), 'wb' do |f| 
+      f.write <<END_SOURCE
+package test.players;
+
+import battlecode.common.RobotController;
+
+public class RobotPlayer implements Runnable {
+  public static RobotController rc;
+
+  public RobotPlayer(RobotController controller) {
+    rc = controller;
+  }
+
+  public void run() {
+    while (true) {
+      rc.yield();
+    }
+  }
+}
+
+END_SOURCE
+    end
+    
+    suite_path = File.join local_path, 'suite'
+    FileUtils.mkdir_p suite_path
+    File.open File.join(suite_path, 'win_vs_yield.rb'), 'wb' do |f| 
+      f.write <<END_SOURCE
+vs 'yield'
+map 'venice'
+replace_class '#{target_player}.RobotPlayer', 'test.players.RobotPlayer'
+
+match do
+  it 'must win in any way' do
+    should_win
+  end
+end
+END_SOURCE
+    end
+    
+    File.open File.join(local_path, 'bcpm.yml'), 'wb' do |f|
+      config = { :target_player => target_player }
+      YAML.dump config, f
+    end
+  end
 end  # module Bcpm::Tests
 
 end  # namespace Bcpm

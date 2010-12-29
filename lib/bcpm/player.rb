@@ -56,6 +56,28 @@ module Player
     local_path
   end
 
+  # Creates a player from the built-in template.
+  #
+  # Returns the path to the player on the local system, or nil if something went wrong.
+  def self.create(local_name)
+    old_name = 'template'
+    local_path = File.join local_root, local_name
+    if File.exist?(local_path)
+      puts "Player already installed at #{local_path}!"
+      return nil
+    end
+    write_template local_path
+    unless source_path = rename(local_path, old_name)
+      puts "Repository #{repo_uri} doesn't seem to contain a player!"
+      FileUtils.rm_rf local_path      
+      return nil
+    end
+
+    Bcpm::Dist.add_player source_path
+    configure local_path
+    local_path
+  end
+
   # Undoes the effects of an install or checkpoint call.
   #
   # Returns true for success, or false if something went wrong.
@@ -208,6 +230,34 @@ END_CONFIG
   </natures>
 </projectDescription>
 END_CONFIG
+  end
+  
+  # Writes the built-in player template.
+  def self.write_template(local_path)
+    src_path = File.join local_path, 'src', 'template'
+    FileUtils.mkdir_p src_path
+    File.open File.join(src_path, 'RobotPlayer.java'), 'wb' do |f| 
+      f.write <<END_SOURCE
+package template;
+
+import battlecode.common.RobotController;
+
+public class RobotPlayer implements Runnable {
+  public static RobotController rc;
+
+  public RobotPlayer(RobotController controller) {
+    rc = controller;
+  }
+
+  public void run() {
+    while (true) {
+      rc.yield();
+    }
+  }
+}
+
+END_SOURCE
+    end
   end
 end  # module Bcpm::Player
 
