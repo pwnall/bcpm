@@ -1,3 +1,5 @@
+v0.9. Player and tests go in one repository. Simplifies everything!
+
 v0.8.9. Improved source code patching approach.
 
 v0.8.8. Added .gitignore files to built-in templates.

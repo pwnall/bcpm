@@ -10,69 +10,50 @@ USAGE
 
    bcpm dist
 
-3a. Install the test suite.  Later, use the same command to update the suite.
-
-   bcpm suite
-
-After executing the commands above, import the project into Eclipse
-(File > Import > Existing Projects into Workspace).
-   
-4a. Check out a player repository and set it up for development.
+3a. Check out a player repository and set it up for development.
 
    cd ~/workspace  # Your Eclipse workspace.
    bcpm install git@git.pwnb.us:six370/yield.git
 
-You'll need to import the project into Eclipse.
+After executing the commands above, import the project into Eclipse
+(File > Import > Existing Projects into Workspace).
 
 3b. Create a blank player.
 
    bcpm new team050
-   
-4b. Create a blank test suite.
-
-   bcpm newsuite tests team050
-   
+     
 If you go this route, you will have to create the git repositories yourself, and push them.
 
-5. Run the tests against the player.
+4. Run the player's test suite.
 
     bcpm test yield
     bcpm test git@git.pwnb.us:six370/yield.git
 
-6. Run a single test case against the player.
+5. Run a single test case in the player's test suite.
 
     bcpm case yield win_vs_yield
-    bcpm case git@git.pwnb.us:six370/yield.git win_vs_yield
     
     # The following commands run the first match right away, for maximum iterating speed.
     bcpm livecase yield win_vs_yield
-    bcpm livecase git@git.pwnb.us:six370/yield.git win_vs_yield
 
-7. Run a game against some other player code.
+6. Run a game against some other player code.
 
     bcpm match yield team000 venice
 
-8. Remove the installed player. (removing the project folder is not enough!)
+7. Remove the installed player. (removing the project folder is not enough!)
 
     bcpm uninstall yield
     
-9. Create a new player from an existing template.
+8. Create a new player from an existing template.
 
    bcpm copy myplayer git@git.pwnb.us:six370/yield.git
 
 You'll need to import the project into Eclipse, and setup a git repository for the player.
 
 
-TEST SUITES
+TESTING
 
-The test suite must have its Java code structured just like the player (one package under 'src'),
-and the recommended package name is 'test'. It must have a 'bcpm.yml' containing the name of the
-player that the tests are written against, structured as follows.
-
-    ---
-    :target_player: team989
-
-The actual tests are .rb (Ruby) files in the 'suite' directory. The following example showcases the
+The test cases are .rb (Ruby) files in the 'suite' directory. The following example showcases the
 functionality available in a test suite. The suite DSL slightly resembles rspec.
 
     # Set the opponent for future matches.
@@ -84,21 +65,17 @@ functionality available in a test suite. The suite DSL slightly resembles rspec.
     # Disable energon draining.
     option 'bc.engine.upkeep', false
     
-    # Replace a .java file in the player under test with a .java file in the test suite. 
-    replace_class 'team989.RobotPlayer', 'test.players.RobotPlayer'
-    
-    # Add a .java file in the test suite to the player under test.
-    add_class 'team989.LoggingStubs', 'test.stubs.LoggingStubs'
+    # Replace a .java file in the player under test with a .java file in the test suite.
+    # Both names are automatically prefixed with the team package ('yield.' in this case).
+    replace_class 'RobotPlayer', 'test.players.TestRobotPlayer'
     
     # Re-route all calls that look like target.canMove(...) to
-    # team989.LoggingStubs.canMoveStub(target, ...)
-    stub_call 'canMove', 'team989.LoggingStubs.canMoveStub'
+    # yield.test.LoggingStubs.canMoveStub(target, ...)
+    stub_call 'canMove', 'test.LoggingStubs.canMoveStub'
     
-    # Replace the code marked with Stubs.canMove.logo in team989.LoggingStubs with the code marked
-    # Stubs.canMove.logoSource in test.stubs.LoggingStubs
-    #
-    # Note that team989.LoggingStubs was created by an earlier add_class directive.
-    replace_code 'team989.LoggingStubs', 'Stubs.canMove.logo',
+    # Replace the code marked with Stubs.canMove.logo in yield.LoggingStubs with the code marked
+    # Stubs.canMove.logoSource in yield.test.stubs.LoggingStubs
+    replace_code 'LoggingStubs', 'Stubs.canMove.logo',
                  'test.stubs.LoggingStubs', 'Stubs.canMove.logoSource'
     
     # Run a test match to check some conditions.
@@ -122,7 +99,7 @@ functionality available in a test suite. The suite DSL slightly resembles rspec.
 To prevent infinite recursion, stubbing should be disabled in the actual stubs. The stub
 implementation below demonstrates the syntax for stubbing and code replacement.
 
-    package test.stubs;
+    package yield.test.stubs;
     
     import battlecode.common.Direction;
     import battlecode.common.RobotController;
@@ -151,8 +128,8 @@ expressions. Following these best practices should help avoid broken builds:
 
   * Use Eclipse's "Organize imports" feature to achieve the item below:
   * Class names should be unqualified, and imports should use fully qualified names.
-  * A test class should only depend on player code. E.g., move shared test code in team???.tests.
-  * Use the same class name (but different package names) in add_class and replace_class.
+  * Use the same class name (but different package names) in replace_class.
+  * A replace_class source class should only depend on classes in other packages.
 
 
 INSTALLATION

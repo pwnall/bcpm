@@ -33,20 +33,16 @@ class Environment
   end
   
   # Puts together an environment according to the blueprint.
-  #
-  # Args:
-  #   player_source_path_or_uri:: name or git uri for the player source code
-  #   branch:: branch in git repository to be checked out
-  def setup(player_source_path_or_uri, branch)
+  def setup(suite_path)
     return true if @available
+    
     begin
-      @player_path = Bcpm::Player.checkpoint player_source_path_or_uri, branch, player_name      
-      raise "Failed to checkout player #{player_source_path_or_uri}" unless @player_path
+      test_player = File.basename suite_path
+
+      @player_path = Bcpm::Player.checkpoint test_player, 'master', player_name
+      raise "Failed to checkpoint player at #{suite_path}" unless @player_path
       @player_src = Bcpm::Player.package_path(@player_path)
-      
-      @test_player = Bcpm::Tests.target_player
-      @test_src = Bcpm::Tests.package_path
-      
+            
       file_ops
       patch_ops
       
@@ -96,11 +92,11 @@ class Environment
         source, source_fragment = *source
       end
       
-      target.sub! /^#{@test_player}./, "#{@player_name}."
-      source.sub! /^#{@test_player}./, "#{@player_name}."
-      file_path = java_path(@test_src, source)
+      target = "#{@player_name}.#{target}"
+      source = "#{@player_name}.#{source}"
+      file_path = java_path @player_src, source
       
-      next unless File.exist?(file_path)
+      next unless File.exist? file_path
       source_contents = File.read file_path
 
       case op_type        
@@ -111,21 +107,19 @@ class Environment
         contents = fragment_match[0]
       end
   
-      contents.gsub! /(^|[^A-Za-z0-9_.])#{@test_player}([^A-Za-z0-9_]|$)/, "\\1#{@player_name}\\2"
-
-      source_pkg = java_package(source)
-      target_pkg = java_package(target)
+      source_pkg = java_package source
+      target_pkg = java_package target
       unless source_pkg == target_pkg
         contents.gsub! /(^|[^A-Za-z0-9_.])#{source_pkg}([^A-Za-z0-9_]|$)/, "\\1#{target_pkg}\\2"
       end
   
-      source_class = java_class(source)
-      target_class = java_class(target)
+      source_class = java_class source
+      target_class = java_class target
       unless source_class == target_class
         contents.gsub! /(^|[^A-Za-z0-9_])#{source_class}([^A-Za-z0-9_]|$)/, "\\1#{target_class}\\2"
       end
         
-      file_path = java_path(@player_src, target)
+      file_path = java_path @player_src, target
       
       case op_type
       when :file
@@ -150,12 +144,6 @@ class Environment
   def patch_ops
     return if @patch_ops.empty?
     
-    old_ops, @patch_ops = @patch_ops, []
-    old_ops.each do |op|
-      @patch_ops << [op[0], op[1].sub(/^#{@test_player}./, "#{@player_name}."),
-                            op[2].sub(/^#{@test_player}./, "#{@player_name}.")]
-    end
-    
     Dir.glob(File.join(@player_src, '**', '*.java')).each do |file|
       old_contents = File.read file
       lines = old_contents.split("\n")
@@ -177,7 +165,8 @@ class Environment
             case op_type
             when :stub
               if stubs_enabled
-                line.gsub! /(^|[^A-Za-z0-9_.])([A-Za-z0-9_.]*)\.#{source}\(/, "\\1#{target}(\\2,"
+                line.gsub! /(^|[^A-Za-z0-9_.])([A-Za-z0-9_.]*)\.#{source}\(/,
+                           "\\1#{player_name}.#{target}(\\2,"
               end
             end
           end

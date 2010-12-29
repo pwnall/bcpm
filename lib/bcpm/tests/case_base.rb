@@ -58,13 +58,7 @@ class CaseBase
       end
     end
     
-    # Plugs a test class into the player code.
-    def add_class(target, source)
-      _env_change
-      @env.file_op [:file, target, source]
-    end
-
-    # Replaces a player class with a test class.
+    # Replaces a class implementation file (.java) with another one (presumably from tests).
     def replace_class(target, source)
       _env_change
       @env.file_op [:file, target, source]

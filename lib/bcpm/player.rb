@@ -95,6 +95,53 @@ module Player
     local_path = File.join local_root, local_name
     configure local_path
   end
+  
+  # Runs the player's test suite.
+  def self.run_suite(local_name)
+    local_path = File.join local_root, local_name
+    unless has_suite? local_path
+      puts "No test suite found at #{local_path}!"
+      return false
+    end
+    new_suite(local_path).run false
+  end
+  
+  # Runs a case in the test suite against a player codebase. 
+  def self.run_case(case_name, live, local_name, branch = 'master')
+    local_path = File.join local_root, local_name
+    unless has_suite? local_path
+      puts "No test suite found at #{local_path}!"
+      return false
+    end    
+    
+    case_file = case_name + '.rb'
+    files = suite_files(local_path).select { |file| File.basename(file) == case_file }
+    unless files.length == 1
+      puts "Ambiguous case name! It matched #{files.count} cases.\n#{files.join("\n")}\n"
+      return false
+    end
+    suite = Bcpm::Tests::Suite.new(local_path)
+    suite.add_cases files
+    suite.run live
+  end
+    
+  # Creates a Suite instance for running all the tests.
+  def self.new_suite(local_path)
+    suite = Bcpm::Tests::Suite.new local_path
+    suite.add_cases suite_files(local_path)
+    suite
+  end
+  
+  # All the test cases in the suite of the given player.
+  def self.suite_files(local_path)
+    Dir.glob File.join(local_path, 'suite', '**', '*.rb')
+  end
+
+  # True if a battlecode distribution is installed on the local machine.
+  def self.has_suite?(local_path)
+    File.exist? File.join(local_path, 'suite')
+  end
+  
 
   # Configures a player's source code project.
   def self.configure(local_path)
@@ -201,7 +248,7 @@ module Player
 <classpath>
   <classpathentry kind="src" path="src"/>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-  <classpathentry exported="true" kind="lib" path="#{jar_path}"/>
+  <classpathentry kind="lib" path="#{jar_path}"/>
   <classpathentry kind="output" path="bin"/>
 </classpath>
 END_CONFIG
@@ -255,6 +302,46 @@ public class RobotPlayer implements Runnable {
     }
   }
 }
+END_SOURCE
+    end
+    
+    src_path = File.join local_path, 'src', 'template', 'test', 'players'
+    FileUtils.mkdir_p src_path
+    File.open File.join(src_path, 'RobotPlayer.java'), 'wb' do |f| 
+      f.write <<END_SOURCE
+package template.test.players;
+
+import battlecode.common.RobotController;
+
+public class RobotPlayer implements Runnable {
+  public static RobotController rc;
+
+  public RobotPlayer(RobotController controller) {
+    rc = controller;
+  }
+
+  public void run() {
+    while (true) {
+      rc.yield();
+    }
+  }
+}
+END_SOURCE
+    end
+    
+    suite_path = File.join local_path, 'suite'
+    FileUtils.mkdir_p suite_path
+    File.open File.join(suite_path, 'win_vs_yield.rb'), 'wb' do |f| 
+      f.write <<END_SOURCE
+vs 'yield'
+map 'venice'
+replace_class 'RobotPlayer', 'test.players.RobotPlayer'
+
+match do
+  it 'must win in any way' do
+    should_win
+  end
+end
 END_SOURCE
     end
     

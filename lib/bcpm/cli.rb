@@ -15,18 +15,6 @@ module CLI
       Bcpm::Update.upgrade
     when 'dist'  # Install or upgrade the battlecode distribution.
       Bcpm::Dist.upgrade
-    when 'suite'  # Install or upgrade the test suite.
-      Bcpm::Tests.upgrade
-    when 'newsuite'  # Create a new test suite from the built-in template.
-      unless Bcpm::Dist.installed?
-        puts "Please install a battlecode distribution first!"
-        exit 1
-      end
-      if args.length < 3
-        puts "Please supply the new suite's project name, and its target player!"
-        exit 1
-      end
-      exit 1 unless Bcpm::Tests.create(args[1], args[2])
     when 'install'  # Add a player project to the workspace, from a git repository.
       unless Bcpm::Dist.installed?
         puts "Please install a battlecode distribution first!"
@@ -90,25 +78,17 @@ module CLI
       end
       Bcpm::Match.replay args[1]
     when 'test'  # Run the entire test suite against a player.
-      unless Bcpm::Tests.installed?
-        puts "Please install a test suite first!"
-        exit 1
-      end
       if args.length < 2
-        puts "Please supply the player name or repository!"
+        puts "Please supply the player name!"
         exit 1
       end
-      Bcpm::Tests.run args[1]
+      Bcpm::Player.run_suite args[1]
     when 'case', 'testcase', 'livecase', 'live'  # Run a single testcase against a player.
-      unless Bcpm::Tests.installed?
-        puts "Please install a test suite first!"
-        exit 1
-      end
       if args.length < 3
-        puts "Please supply the player name or repository, and the testcase name!"
+        puts "Please supply the player name and the testcase name!"
         exit 1
       end
-      Bcpm::Tests.run_case args[2], args[0][0, 4] == 'live', args[1]
+      Bcpm::Player.run_case args[2], args[0][0, 4] == 'live', args[1]
     else
       help
       exit 1

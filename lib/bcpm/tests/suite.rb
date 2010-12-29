@@ -12,9 +12,12 @@ class Suite
   attr_reader :matches
   # All test cases.
   attr_reader :tests
+  # Path to the suite's local repository.
+  attr_reader :local_path
   
   # Blank suite.
-  def initialize
+  def initialize(local_path)
+    @local_path = local_path
     @tests = []
     @matches = []
     @environments = []
@@ -29,7 +32,7 @@ class Suite
       begin
         klass.class_eval code, file
       rescue Exception => e
-        trace = Bcpm::Tests::AssertionError.short_backtrace e.backtrace
+        trace = short_backtrace e.backtrace
         print "Error in test case #{file}\n"
         print "#{e.class.name}: #{e.to_s}\n#{trace.join("\n")}\n\n"
         next
@@ -44,6 +47,8 @@ class Suite
   
   # Runs all the tests in the suite.
   def run(live = false)
+    environments.each { |e| e.setup local_path }
+
     wins, fails, errors, skipped, totals = 0, 0, 0, 0, 0
     failures = []
     tests.each_with_index do |test, i|
@@ -60,7 +65,8 @@ class Suite
       failure_string = nil
       begin
         if failure = test.check_output
-          failure_string = "#{failure.to_s}\n#{failure.short_backtrace.join("\n")}"
+          trace = short_backtrace failure.backtrace
+          failure_string = "#{failure.to_s}\n#{trace.join("\n")}"
           fails += 1
           print 'F'
         else
@@ -84,7 +90,23 @@ class Suite
       print test.match.stash_data            
       print "#{string}\n\n"
     end
-  end  
+
+    environments.each { |e| e.teardown }
+    self
+  end
+  
+  # Trims backtrace to the confines of the test suite.
+  def short_backtrace(backtrace)
+    trace = backtrace
+    first_line = trace.find_index { |line| line.index local_path }
+    last_line = trace.length - 1 - trace.reverse.find_index { |line| line.index local_path }
+    # Leave the trace untouched if it doesn't go through the test suite.
+    if first_line && last_line
+      trace = trace[first_line..last_line]
+      trace[-1] = trace[-1].sub /in `.*'/, 'in (test case)'
+    end
+    trace
+  end   
 end  # class Bcpm::Tests::Suite
 
 end  # namespace Bcpm::Tests
