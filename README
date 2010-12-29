@@ -115,7 +115,7 @@ implementation below demonstrates the syntax for stubbing and code replacement.
       public static void markTest() {
         //$ +mark: Stubs.canMove.logoSource
         System.out.println("This should show up");
-        //$ -mark: Stubs.canMove.logo    
+        //$ -mark: Stubs.canMove.logoSource
       }
     }
 

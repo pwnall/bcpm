@@ -71,13 +71,32 @@ class Environment
     @file_ops.each do |op|
       op_type, target, source = *op
       
+      if op_type == :fragment
+        target, target_fragment = *target
+        source, source_fragment = *source
+      end
+      
       target.sub! /^#{@test_player}./, "#{@player_name}."
       eff_source = source.sub /^#{@test_player}./, "#{@player_name}."
 
-      file_path = java_path(@test_src, eff_source)
-      next unless File.exist?(file_path)
-      contents = File.read file_path
+      case op_type
+      when :file
+        file_path = java_path(@test_src, eff_source)
+      else
+        file_path = java_path(@test_src, eff_source)
+      end
       
+      next unless File.exist?(file_path)
+      source_contents = File.read file_path
+
+      case op_type        
+      when :file
+        contents = source_contents
+      when :fragment
+        next unless fragment_match = fragment_regexp(source_fragment).match(source_contents)
+        contents = fragment_match[0]
+      end
+  
       source_pkg = java_package(source)
       eff_source_pkg = java_package(eff_source)
       target_pkg = java_package(target)
@@ -87,16 +106,29 @@ class Environment
       unless eff_source_pkg == target_pkg
         contents.gsub! /(^|[^A-Za-z0-9_.])#{source_pkg}([^A-Za-z0-9_]|$)/, "\\1#{target_pkg}\\2"
       end
-
+  
       source_class = java_class(eff_source)
       target_class = java_class(target)
       unless source_class == target_class
         contents.gsub! /(^|[^A-Za-z0-9_])#{source_class}([^A-Za-z0-9_]|$)/, "\\1#{target_class}\\2"
       end
-      
+        
       file_path = java_path(@player_src, target)
-      next unless File.exist?(File.dirname(file_path))
-      File.open(file_path, 'wb') { |f| f.write contents }
+      
+      case op_type
+      when :file
+        next unless File.exist?(File.dirname(file_path))
+      when :fragment
+        next unless File.exist?(file_path)
+        source_contents = File.read file_path
+        # Not using a string because source code might contain \1 which would confuse gsub.
+        source_contents.gsub! fragment_regexp(target_fragment) do |match|
+          "#{$1}\n#{contents}\n#{$3}"
+        end
+        contents = source_contents
+      end
+      
+      File.open(file_path, 'wb') { |f| f.write contents }  
     end
   end
   
@@ -140,6 +172,14 @@ class Environment
       contents = lines.join("\n")
       File.open(file, 'wb') { |f| f.write contents } unless contents == old_contents
     end
+  end
+  
+  # Regular expression matching a code fragment.
+  #
+  # The expression captures three groups: the fragment start marker, the fragment, and the fragment
+  # end marker.
+  def fragment_regexp(label)
+    /^([ \t]*\/\/\$[ \t]*\+mark\:[ \t]*#{label}\s)(.*)(\n[ \t]*\/\/\$[ \t]*\-mark\:[ \t]*#{label}\s)/m
   end
   
   # Path to .java source for a class.

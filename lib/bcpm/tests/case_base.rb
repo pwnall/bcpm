@@ -70,6 +70,12 @@ class CaseBase
       @env.file_op [:file, target, source]
     end
     
+    # Replaces all fragments labeled with target_fragment in target_class with another fragment.
+    def replace_code(target_class, target_fragment, source_class, source_fragment)
+      _env_change
+      @env.file_op [:fragment, [target_class, target_fragment], [source_class, source_fragment]]
+    end
+    
     # Redirects all method calls using a method name to a static method.
     def stub_call(source, target)
       _env_change
