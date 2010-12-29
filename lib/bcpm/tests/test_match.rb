@@ -37,8 +37,8 @@ class TestMatch
   end
   
   # Run the game.
-  def run
-    @data = Bcpm::Match.match_data @environment.player_name, @vs, @map, @options
+  def run(live = false)
+    @data = Bcpm::Match.match_data @environment.player_name, @vs, @map, live, @options
     @output = data[:ant]
   end
 

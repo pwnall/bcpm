@@ -42,11 +42,11 @@ module Tests
   
   # Runs the test suite against a player codebase.
   def self.run(player_name_or_uri, branch = 'master')
-    run_suite new_suite, player_name_or_uri, branch
+    run_suite new_suite, player_name_or_uri, branch, false
   end
   
   # Runs a case in the test suite against a player codebase. 
-  def self.run_case(case_name, player_name_or_uri, branch = 'master')
+  def self.run_case(case_name, live, player_name_or_uri, branch = 'master')
     case_file = case_name + '.rb'
     files = suite_files.select { |file| File.basename(file) == case_file }
     unless files.length == 1
@@ -55,13 +55,13 @@ module Tests
     end
     suite = Bcpm::Tests::Suite.new
     suite.add_cases files
-    run_suite suite, player_name_or_uri, branch
+    run_suite suite, player_name_or_uri, branch, live
   end
   
   # Runs a test suite against a player codebase.
-  def self.run_suite(suite, player_name_or_uri, branch)
+  def self.run_suite(suite, player_name_or_uri, branch, live)
     suite.environments.each { |e| e.setup player_name_or_uri, branch }
-    suite.run
+    suite.run live
     suite.environments.each { |e| e.teardown }
     suite    
   end

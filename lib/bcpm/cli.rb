@@ -99,7 +99,7 @@ module CLI
         exit 1
       end
       Bcpm::Tests.run args[1]
-    when 'case'  # Run a single testcase against a player.
+    when 'case', 'testcase', 'livecase', 'live'  # Run a single testcase against a player.
       unless Bcpm::Tests.installed?
         puts "Please install a test suite first!"
         exit 1
@@ -108,7 +108,7 @@ module CLI
         puts "Please supply the player name or repository, and the testcase name!"
         exit 1
       end
-      Bcpm::Tests.run_case args[2], args[1]
+      Bcpm::Tests.run_case args[2], args[0][0, 4] == 'live', args[1]
     else
       help
       exit 1

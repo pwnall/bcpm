@@ -43,7 +43,7 @@ class Suite
   end
   
   # Runs all the tests in the suite.
-  def run
+  def run(live = false)
     wins, fails, errors, skipped, totals = 0, 0, 0, 0, 0
     failures = []
     tests.each_with_index do |test, i|
@@ -52,7 +52,11 @@ class Suite
         next
       end
       
-      test.match.run unless test.match.ran?
+      unless test.match.ran?
+        test.match.run live
+        # Only one match can run live, otherwise all hell will break loose.
+        live = false
+      end
       failure_string = nil
       begin
         if failure = test.check_output

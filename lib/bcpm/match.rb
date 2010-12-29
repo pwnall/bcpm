@@ -21,8 +21,9 @@ module Match
   #   player1_name:: name of locally installed player (A)
   #   player2_name:: name of locally installed player (B)
   #   map_name:: name of map .xml file
+  #   run_live:: if true, tries to run the match using the live UI
   #   bc_options:: hash of simulator settings to be added to bc.conf
-  def self.match_data(player1_name, player2_name, map_name, bc_options = {})
+  def self.match_data(player1_name, player2_name, map_name, run_live, bc_options = {})
     uid = tempfile
     tempdir = File.join Dir.tmpdir, uid
     Dir.mkdir tempdir
@@ -56,7 +57,7 @@ module Match
   
   # Replays a match using the binlog (.rms file).
   def self.replay(binfile)
-    tempdir = tempfile
+    tempdir = File.join Dir.tmpdir, tempfile
     Dir.mkdir tempdir
     Dir.chdir tempdir do
       filebase = Dir.pwd
@@ -64,12 +65,12 @@ module Match
 
       bc_config = simulator_config(nil, nil, nil, binfile, nil)
       conf_file = File.join filebase, 'bc.conf'      
-      write_config conf_file, bc_config      
+      write_config conf_file, bc_config
       write_ui_config conf_file, bc_config
       build_file = File.join filebase, 'build.xml'
       write_build build_file, conf_file
       
-      run_build_script build_file, conf_file, match_log, 'run'
+      run_build_script build_file, match_log, 'run'
     end
     FileUtils.rm_rf tempdir
   end
