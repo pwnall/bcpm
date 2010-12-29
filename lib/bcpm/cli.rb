@@ -15,6 +15,8 @@ module CLI
       Bcpm::Dist.upgrade
     when 'suite'  # Install or upgrade the test suite.
       Bcpm::Tests.upgrade
+    when 'gem', 'self'  # Upgrade bcpm.
+      Bcpm::Update.upgrade
     when 'install'  # Add a player project to the workspace, from a git repository.
       unless Bcpm::Dist.installed?
         puts "Please install a battlecode distribution first!"

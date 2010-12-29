@@ -2,34 +2,38 @@ Battlecode (MIT 6.470) package manager.
 
 USAGE
 
-1. Install the Battlecode distribution. Later, use the same command to update the distribution.
+1. Make sure you're using the latest tool version.
+
+   bcpm self
+
+2. Install the Battlecode distribution. Later, use the same command to update the distribution.
 
    bcpm dist
 
-2. Install the test suite.  Later, use the same command to update the suite.
+3. Install the test suite.  Later, use the same command to update the suite.
 
    bcpm suite
 
 After executing the commands above, import the project into Eclipse
 (File > Import > Existing Projects into Workspace).
    
-3. Check out a player repository and set it up for development.
+4. Check out a player repository and set it up for development.
 
    cd ~/workspace  # Your Eclipse workspace.
    bcpm install git@git.pwnb.us:six370/yield.git
 
 You'll need to import the project into Eclipse.
 
-4. Run the tests against the player.
+5. Run the tests against the player.
 
     bcpm test yield
     bcpm test git@git.pwnb.us:six370/yield.git
 
-5. Run a game against some other player code.
+6. Run a game against some other player code.
 
     bcpm match yield team000 venice
     
-6. Create a new player from an existing template.
+7. Create a new player from an existing template.
 
    bcpm new myplayer git@git.pwnb.us:six370/yield.git
 

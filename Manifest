@@ -17,3 +17,4 @@ lib/bcpm/tests/case_base.rb
 lib/bcpm/tests/environment.rb
 lib/bcpm/tests/suite.rb
 lib/bcpm/tests/test_match.rb
+lib/bcpm/update.rb
