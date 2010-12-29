@@ -203,6 +203,7 @@ END_CONFIG
       start = line.index '[java] '
       next unless start
       lines << line[(start + 7)..-1]
+      break if line.index('- Match Finished -')
     end
     lines.join("\n")
   end
