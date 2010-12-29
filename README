@@ -43,6 +43,10 @@ If you go this route, you will have to create the git repositories yourself, and
 
     bcpm case yield win_vs_yield
     bcpm case git@git.pwnb.us:six370/yield.git win_vs_yield
+    
+    # The following commands run the first match right away, for maximum iterating speed.
+    bcpm livecase yield win_vs_yield
+    bcpm livecase git@git.pwnb.us:six370/yield.git win_vs_yield
 
 7. Run a game against some other player code.
 
