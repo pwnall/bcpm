@@ -97,14 +97,8 @@ class Environment
       end
       
       target.sub! /^#{@test_player}./, "#{@player_name}."
-      eff_source = source.sub /^#{@test_player}./, "#{@player_name}."
-
-      case op_type
-      when :file
-        file_path = java_path(@test_src, eff_source)
-      else
-        file_path = java_path(@test_src, eff_source)
-      end
+      source.sub! /^#{@test_player}./, "#{@player_name}."
+      file_path = java_path(@test_src, source)
       
       next unless File.exist?(file_path)
       source_contents = File.read file_path
@@ -117,17 +111,15 @@ class Environment
         contents = fragment_match[0]
       end
   
+      contents.gsub! /(^|[^A-Za-z0-9_.])#{@test_player}([^A-Za-z0-9_]|$)/, "\\1#{@player_name}\\2"
+
       source_pkg = java_package(source)
-      eff_source_pkg = java_package(eff_source)
       target_pkg = java_package(target)
       unless source_pkg == target_pkg
         contents.gsub! /(^|[^A-Za-z0-9_.])#{source_pkg}([^A-Za-z0-9_]|$)/, "\\1#{target_pkg}\\2"
       end
-      unless eff_source_pkg == target_pkg
-        contents.gsub! /(^|[^A-Za-z0-9_.])#{source_pkg}([^A-Za-z0-9_]|$)/, "\\1#{target_pkg}\\2"
-      end
   
-      source_class = java_class(eff_source)
+      source_class = java_class(source)
       target_class = java_class(target)
       unless source_class == target_class
         contents.gsub! /(^|[^A-Za-z0-9_])#{source_class}([^A-Za-z0-9_]|$)/, "\\1#{target_class}\\2"
