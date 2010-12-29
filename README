@@ -32,7 +32,7 @@ You'll need to import the project into Eclipse.
 6. Run a single test case against the player.
 
     bcpm case yield win_vs_yield
-    bcpm test git@git.pwnb.us:six370/yield.git
+    bcpm case git@git.pwnb.us:six370/yield.git win_vs_yield
 
 7. Run a game against some other player code.
 
