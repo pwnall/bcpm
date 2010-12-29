@@ -1,3 +1,5 @@
+v0.8.8. Added .gitignore files to built-in templates.
+
 v0.8.7. Bugfix in match output processing for live matches.
 
 v0.8.6. Live match testcase option.
