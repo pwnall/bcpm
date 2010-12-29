@@ -26,11 +26,12 @@ module Match
     uid = tempfile
     tempdir = File.join Dir.tmpdir, uid
     Dir.mkdir tempdir
-    textlog, binlog, antlog = nil, nil, nil
+    textlog, binlog, antlog = nil, nil, nil, nil, nil
     Dir.chdir tempdir do
       filebase = Dir.pwd
       binfile = File.join filebase, 'match.rms'
       txtfile = File.join filebase, 'match.txt'
+      build_log = File.join filebase, 'build.log'
       match_log = File.join filebase, 'match.log'
       scribe_log = File.join filebase, 'scribe.log' 
 
@@ -41,12 +42,12 @@ module Match
       build_file = File.join filebase, 'build.xml'
       write_build build_file, conf_file
       
-      run_build_script build_file, conf_file, match_log, 'file'
-      run_build_script build_file, conf_file, scribe_log, 'transcribe'
+      match_output = run_build_script build_file, match_log, 'file'
+      scribe_output = run_build_script build_file, scribe_log, 'transcribe'
       
       textlog = File.exist?(txtfile) ? File.open(txtfile, 'rb') { |f| f.read } : ''
       binlog = File.exist?(binfile) ? File.open(binfile, 'rb') { |f| f.read } : ''
-      antlog = File.exist?(match_log) ? File.open(match_log, 'rb') { |f| f.read } : ''
+      antlog = File.exist?(match_log) ? File.open(match_log, 'rb') { |f| f.read } : match_output
     end
     FileUtils.rm_rf tempdir
     
@@ -147,9 +148,11 @@ END_CONFIG
   end
   
   # Runs the battlecode Ant script.
-  def self.run_build_script(build_file, conf_file, log_file, target)
+  #
+  # Return the ant stdout (messages not written to the ant log).
+  def self.run_build_script(build_file, log_file, target)
     command = Shellwords.shelljoin(['ant', '-noinput', '-buildfile', build_file,
-        '-Dbcconf=' + conf_file, '-logfile', log_file, target])
+                                    '-logfile', log_file, target])
     Kernel.`(command)
   end
   

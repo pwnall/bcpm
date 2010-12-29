@@ -1,4 +1,5 @@
 require 'English'
+require 'fileutils'
 
 # :nodoc: namespace
 module Bcpm
@@ -20,6 +21,7 @@ class Environment
   def initialize(prebuilt_name = nil)
     @file_ops = [] 
     @patch_ops = []
+    @build_log = nil
 
     if prebuilt_name
       @player_name = prebuilt_name
@@ -47,6 +49,12 @@ class Environment
       
       file_ops
       patch_ops
+      
+      unless build
+        print "Test environment build failed! Some tests will not run!\n"
+        print "#{@build_log}\n"
+        return false
+      end
     rescue Exception => e
       print "Failed setting up test environment! Some tests will not run!\n"
       print "#{e.class.name}: #{e.to_s}\n#{e.backtrace.join("\n")}\n\n"
@@ -77,6 +85,8 @@ class Environment
   end
   
   # Copies files from the test suite to the environment.
+  #  
+  # Called by setup, uses its environment.
   def file_ops
     @file_ops.each do |op|
       op_type, target, source = *op
@@ -143,6 +153,8 @@ class Environment
   end
   
   # Applies the patch operations to the source code in the environment.
+  #
+  # Called by setup, uses its environment.
   def patch_ops
     return if @patch_ops.empty?
     
@@ -182,6 +194,29 @@ class Environment
       contents = lines.join("\n")
       File.open(file, 'wb') { |f| f.write contents } unless contents == old_contents
     end
+  end
+  
+  # Builds the binaries for the player in this environment.
+  #
+  # Called by setup, uses its environment.
+  #
+  # Returns true for success, false for failure.
+  def build
+    uid = 'build_' + player_name
+    tempdir = File.join Dir.tmpdir, uid
+    FileUtils.mkdir_p tempdir
+    Dir.chdir tempdir do
+      filebase = Dir.pwd
+      build_log = File.join filebase, 'build.log'
+      build_file = File.join filebase, 'build.xml'
+      build_output = Bcpm::Match.write_build build_file, 'bc.conf'
+      
+      Bcpm::Match.run_build_script build_file, build_log, 'build'
+      @build_log = File.exist?(build_log) ? File.open(build_log, 'rb') { |f| f.read } : build_output      
+    end
+    FileUtils.rm_rf tempdir
+    
+    @build_log.index("\nBUILD SUCCESSFUL\n") ? true : false
   end
   
   # Regular expression matching a code fragment.

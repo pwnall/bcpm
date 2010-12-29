@@ -8,17 +8,17 @@ module Tests
 module Assertions  
   # Fails unless the match was won.
   def should_win
-    return if match.output_lines[-3].index(' (A) wins')
-    raise Bcpm::Tests::AssertionError, 'Player was expected to win, but lost!'
+    return if match.outcome.index(' (A) wins')
+    raise Bcpm::Tests::AssertionError, "Player was expected to win, but didn't! " + match.outcome
   end
 
   # Fails unless the match was won, and the Reason: line includes the argument text. 
   def should_win_by(reason)
     should_win
     
-    return if output_lines[-2].index(reason)
+    return if match.reason.index(reason)
     raise Bcpm::Tests::AssertionError, "Player was expected to win by #{reason} and didn't. " +
-        match.output_lines[-2]
+                                       match.reason
   end  
 
   # Fails if the player code threw any exception.

@@ -1,3 +1,5 @@
+v0.8.5. Better handling of build errors.
+
 v0.8.4. Unified output for match and test commands.
 
 v0.8.3. Platform-specific text file open command.

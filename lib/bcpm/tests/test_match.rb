@@ -61,6 +61,20 @@ class TestMatch
     @output_lines ||= output.split("\n")
   end
   
+  # The output line showing who won the game.
+  def outcome
+    outcome = output_lines[-3] || ''
+    outcome = '(no victory)' unless outcome.index('wins')
+    outcome
+  end
+
+  # The output line showing the reason the game ended.
+  def reason
+    reason = output_lines[-2] || ''
+    reason = '(no reason)' unless reason.index('Reason:')
+    reason
+  end
+  
   # Stashes the match data somewhere on the system.
   #
   # Returns a string containing user-friendly instructions for accessing the match data.

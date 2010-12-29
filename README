@@ -63,10 +63,10 @@ TEST SUITES
 
 The test suite must have its Java code structured just like the player (one package under 'src'),
 and the recommended package name is 'test'. It must have a 'bcpm.yml' containing the name of the
-player that the tests are written against, structured as follows
+player that the tests are written against, structured as follows.
 
-  ---
-  :target_player: team989
+    ---
+    :target_player: team989
 
 The actual tests are .rb (Ruby) files in the 'suite' directory. The following example showcases the
 functionality available in a test suite. The suite DSL slightly resembles rspec.
@@ -141,6 +141,14 @@ implementation below demonstrates the syntax for stubbing and code replacement.
         //$ -mark: Stubs.canMove.logoSource
       }
     }
+
+The code patching directives use very simple implementations based on file copying and regular
+expressions. Following these best practices should help avoid broken builds:
+
+  * Use Eclipse's "Organize imports" feature to achieve the item below:
+  * Class names should be unqualified, and imports should use fully qualified names.
+  * A test class should only depend on player code. E.g., move shared test code in team???.tests.
+  * Use the same class name (but different package names) in add_class and replace_class.
 
 
 INSTALLATION
