@@ -70,7 +70,7 @@ module CLI
         exit 1
       end
       Bcpm::Match.replay args[1]
-    when 'test'
+    when 'test'  # Run the entire test suite against a player.
       unless Bcpm::Tests.installed?
         puts "Please install a test suite first!"
         exit 1
@@ -80,6 +80,16 @@ module CLI
         exit 1
       end
       Bcpm::Tests.run args[1]
+    when 'case'  # Run a single testcase against a player.
+      unless Bcpm::Tests.installed?
+        puts "Please install a test suite first!"
+        exit 1
+      end
+      if args.length < 3
+        puts "Please supply the player name or repository, and the testcase name!"
+        exit 1
+      end
+      Bcpm::Tests.run_case args[2], args[1]
     else
       help
       exit 1

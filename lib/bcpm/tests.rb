@@ -18,7 +18,7 @@ module Tests
 
     unless configure(suite_path) && File.exist?(File.join(suite_path, 'suite'))
       puts "Repository does not contain a test suite!"
-      exit 1
+      return nil
     end    
     Bcpm::Config[:tests_repo_uri] = repo_uri
     Bcpm::Config[:tests_path] = suite_path
@@ -26,19 +26,40 @@ module Tests
   
   # Runs the test suite against a player codebase.
   def self.run(player_name_or_uri, branch = 'master')
-    suite = new_suite
+    run_suite new_suite, player_name_or_uri, branch
+  end
+  
+  # Runs a case in the test suite against a player codebase. 
+  def self.run_case(case_name, player_name_or_uri, branch = 'master')
+    case_file = case_name + '.rb'
+    files = suite_files.select { |file| File.basename(file) == case_file }
+    unless files.length == 1
+      puts "Ambiguous case name! It matched #{files.count} cases.\n#{files.join("\n")}\n"
+      return false
+    end
+    suite = Bcpm::Tests::Suite.new
+    suite.add_cases files
+    run_suite suite, player_name_or_uri, branch
+  end
+  
+  # Runs a test suite against a player codebase.
+  def self.run_suite(suite, player_name_or_uri, branch)
     suite.environments.each { |e| e.setup player_name_or_uri, branch }
     suite.run
     suite.environments.each { |e| e.teardown }
-    suite
+    suite    
   end
   
   # Creates a Suite instance for running all the tests.
   def self.new_suite
-    files = Dir.glob File.join(suite_path, 'suite', '**', '*.rb')
     suite = Bcpm::Tests::Suite.new
-    suite.add_cases files
+    suite.add_cases suite_files
     suite
+  end
+  
+  # All the test cases in a suite.
+  def self.suite_files
+    Dir.glob File.join(suite_path, 'suite', '**', '*.rb')
   end
 
   # True if a battlecode distribution is installed on the local machine.
