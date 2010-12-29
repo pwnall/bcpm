@@ -1,5 +1,6 @@
 require 'English'
 require 'shellwords'
+require 'thread'
 require 'tmpdir'
 
 # :nodoc: namespace
@@ -40,10 +41,15 @@ module Match
       bc_config.merge! bc_options
       conf_file = File.join filebase, 'bc.conf'      
       write_config conf_file, bc_config
+      write_ui_config conf_file, true, bc_config if run_live
       build_file = File.join filebase, 'build.xml'
       write_build build_file, conf_file
       
-      match_output = run_build_script build_file, match_log, 'file'
+      if run_live
+        match_output = run_build_script build_file, match_log, 'run', 'Stop buffering match'
+      else
+        match_output = run_build_script build_file, match_log, 'file'
+      end        
       scribe_output = run_build_script build_file, scribe_log, 'transcribe'
       
       textlog = File.exist?(txtfile) ? File.open(txtfile, 'rb') { |f| f.read } : ''
@@ -66,7 +72,7 @@ module Match
       bc_config = simulator_config(nil, nil, nil, binfile, nil)
       conf_file = File.join filebase, 'bc.conf'      
       write_config conf_file, bc_config
-      write_ui_config conf_file, bc_config
+      write_ui_config conf_file, false, bc_config
       build_file = File.join filebase, 'build.xml'
       write_build build_file, conf_file
       
@@ -118,7 +124,7 @@ module Match
   # Writes the configuration for the battlecode UI.
   #
   # This is a singleton file, so only one client should run at a time.
-  def self.write_ui_config(conffile, options = {})
+  def self.write_ui_config(conffile, run_live, options = {})
     save_path = options['bc.server.save-file'] || ''
     if /mingw/ =~ RUBY_PLATFORM || (/win/ =~ RUBY_PLATFORM && /darwin/ !~ RUBY_PLATFORM)
       save_path = save_path.dup
@@ -129,13 +135,14 @@ module Match
       end
     end
     
+    choice = run_live ? 'LOCAL' : 'FILE'
     File.open(File.expand_path('~/.battlecode.ui'), 'wb') do |f|
       f.write <<END_CONFIG
-choice=FILE
-save=false
-save-file=
-host=
+choice=#{choice}
+save=#{run_live}
+save-file=#{save_path}
 file=#{save_path}
+host=
 analyzeFile=false
 glclient=#{options['bc.client.opengl'] || 'false'}
 showMinimap=false
@@ -151,10 +158,42 @@ END_CONFIG
   # Runs the battlecode Ant script.
   #
   # Return the ant stdout (messages not written to the ant log).
-  def self.run_build_script(build_file, log_file, target)
-    command = Shellwords.shelljoin(['ant', '-noinput', '-buildfile', build_file,
-                                    '-logfile', log_file, target])
-    Kernel.`(command)
+  def self.run_build_script(build_file, log_file, target, run_live = false)
+    if run_live
+      command = Shellwords.shelljoin(['ant', '-noinput', '-buildfile', build_file, target])      
+
+      # Start the build as a subprocess, dump its output to the queue as string fragments.
+      # nil means the subprocess completed.
+      queue = Queue.new
+      thread = Thread.start do
+        IO.popen command do |f|
+          begin
+            loop { queue << f.readpartial(1024) }
+          rescue EOFError
+            queue << nil
+          end
+        end
+      end
+
+      build_output = ''
+      while fragment = queue.pop
+        # Dump the build output to the screen as the simulation happens.
+        print fragment
+        STDOUT.flush
+        build_output << fragment        
+      
+        # Let bcpm carry on when the simulation completes.
+        break if build_output.index(run_live)
+      end
+      
+      # Pretend everything was put in a log file.
+      File.open(log_file, 'wb') { |f| f.write build_output }
+      return thread
+    else
+      command = Shellwords.shelljoin(['ant', '-noinput', '-buildfile', build_file,
+                                      '-logfile', log_file, target])
+      Kernel.`(command)    
+    end
   end
   
   # Selects the battlecode simulator log out of an ant log.
