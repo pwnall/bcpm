@@ -23,9 +23,11 @@ module Assertions
 
   # Fails if the player code threw any exception.
   def should_not_throw
-    if match.output.index(/^(\S*)Exception:(.*?)\n\S/m)
+    p match.output
+    puts match.output
+    if match.output.index(/\n(\S*)Exception(.*?)\n\S/m)
       raise Bcpm::Tests::AssertionError, "Player should not have thrown exceptions! " +
-          "It threw #{$1}Exception:#{$2}"
+          "It threw #{$1}Exception#{$2}"
     end
   end
   
