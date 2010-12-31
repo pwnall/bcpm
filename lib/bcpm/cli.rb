@@ -20,6 +20,7 @@ module CLI
         puts "Please install a battlecode distribution first!"
         exit 1
       end
+      
       if args.length < 2
         puts "Please supply the path to the player repository!"
         exit 1
@@ -30,6 +31,7 @@ module CLI
         puts "Please install a battlecode distribution first!"
         exit 1
       end
+
       if args.length < 3
         puts "Please supply the new player name, and the path to the template player repository!"
         exit 1
@@ -40,18 +42,34 @@ module CLI
         puts "Please install a battlecode distribution first!"
         exit 1
       end
+
       if args.length < 2
         puts "Please supply the new player name!"
         exit 1
       end
       exit 1 unless Bcpm::Player.create(args[1])
     when 'uninstall', 'remove'  # Remove a player project from the workspace.
+      unless Bcpm::Dist.installed?
+        puts "Please install a battlecode distribution first!"
+        exit 1
+      end
+
       if args.length < 2
         puts "Please supply the player name!"
         exit 1
       end 
       Bcpm::Player.uninstall args[1]
     when 'rewire', 'config'  # Re-write a player project's configuration files.
+      unless Bcpm::Dist.installed?
+        puts "Please install a battlecode distribution first!"
+        exit 1
+      end
+      
+      if args.length == 1
+        # Try using the current dir as the player name.
+        args[1, 0] = [File.basename Dir.pwd]
+      end
+
       if args.length < 2
         puts "Please supply the player name!"
         exit 1
@@ -62,6 +80,12 @@ module CLI
         puts "Please install a battlecode distribution first!"
         exit 1
       end
+      
+      if args.length == 3
+        # Try using the current dir as a player name.
+        args[1, 0] = [File.basename Dir.pwd]
+      end
+      
       if args.length < 4
         puts "Please supply the player names and the map name!"
         exit 1
@@ -72,18 +96,45 @@ module CLI
         puts "Please install a battlecode distribution first!"
         exit 1
       end
+      
+      if args.length == 1
+        # Replay the last game.
+        replays = Bcpm::Tests::TestMatch.stashed_replays
+        args[1, 0] = [replays.max] unless replays.empty?
+      end
+      
       if args.length < 2
         puts "Please supply the path to the match binlog (.rms file)!"
         exit 1
       end
       Bcpm::Match.replay args[1]
     when 'test'  # Run the entire test suite against a player.
+      unless Bcpm::Dist.installed?
+        puts "Please install a battlecode distribution first!"
+        exit 1
+      end
+
+      if args.length == 1
+        # Try using the current dir as the player name.
+        args[1, 0] = [File.basename Dir.pwd]
+      end
+
       if args.length < 2
         puts "Please supply the player name!"
         exit 1
       end
       Bcpm::Player.run_suite args[1]
     when 'case', 'testcase', 'livecase', 'live'  # Run a single testcase against a player.
+      unless Bcpm::Dist.installed?
+        puts "Please install a battlecode distribution first!"
+        exit 1
+      end
+      
+      if args.length == 2
+        # Try using the current dir as the player name.
+        args[1, 0] = [File.basename Dir.pwd]
+      end
+
       if args.length < 3
         puts "Please supply the player name and the testcase name!"
         exit 1

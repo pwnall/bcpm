@@ -20,14 +20,13 @@ After executing the commands above, import the project into Eclipse
 
 3b. Create a blank player.
 
-   bcpm new team050
+   bcpm new team1337
      
 If you go this route, you will have to create the git repositories yourself, and push them.
 
 4. Run the player's test suite.
 
     bcpm test yield
-    bcpm test git@git.pwnb.us:six370/yield.git
 
 5. Run a single test case in the player's test suite.
 
@@ -36,15 +35,19 @@ If you go this route, you will have to create the git repositories yourself, and
     # The following commands run the first match right away, for maximum iterating speed.
     bcpm livecase yield win_vs_yield
 
-6. Run a game against some other player code.
+6. Replay the last match ran in a test.
+
+    bcpm replay
+
+7. Run a game against some other player code.
 
     bcpm match yield team000 venice
 
-7. Remove the installed player. (removing the project folder is not enough!)
+8. Remove the installed player. (removing the project folder is not enough!)
 
     bcpm uninstall yield
     
-8. Create a new player from an existing template.
+9. Create a new player from an existing template.
 
    bcpm copy myplayer git@git.pwnb.us:six370/yield.git
 

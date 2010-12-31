@@ -79,13 +79,36 @@ class TestMatch
   #
   # Returns a string containing user-friendly instructions for accessing the match data.
   def stash_data
-    txt_path = File.join Dir.tmpdir, data[:uid] + '.txt'
+    path = self.class.gamesave_path
+    FileUtils.mkdir_p path
+    
+    txt_path = File.join path, data[:uid] + '.txt'
     File.open(txt_path, 'wb') { |f| f.write output } unless File.exist?(txt_path)
-    rms_path = File.join Dir.tmpdir, data[:uid] + '.rms'
+    rms_path = File.join path, data[:uid] + '.rms'
     File.open(rms_path, 'wb') { |f| f.write data[:rms] }  unless File.exist?(rms_path)
   
     "Output: #{open_binary} #{txt_path}\nReplay: bcpm replay #{rms_path}\n"  
-  end  
+  end
+  
+  # All game replays saved by calls to stash_data.
+  def self.stashed_replays
+    Dir.glob File.join(gamesave_path, '*.rms')
+  end
+  
+  # All game outputs saved by calls to stash_data.
+  def self.stashed_outputs
+    Dir.glob File.join(gamesave_path, '*.txt')
+  end
+  
+  # Path where game data (output, replay binlog) is saved.
+  def self.gamesave_path
+    Bcpm::Config[:gamesave_path] ||= default_gamesave_path
+  end
+
+  # Path where game data (output, replay binlog) is saved.
+  def self.default_gamesave_path
+    File.join Dir.tmpdir, 'bcpm'
+  end
 
   # Name of program for opening text files.
   def open_binary
