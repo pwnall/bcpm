@@ -163,10 +163,17 @@ class Environment
             op_type, target, source = *op
       
             case op_type
-            when :stub
+            when :stub_member
               if stubs_enabled
-                line.gsub! /(^|[^A-Za-z0-9_.])([A-Za-z0-9_.]*)\.#{source}\(/,
-                           "\\1#{player_name}.#{target}(\\2,"
+                line.gsub!(/(^|[^A-Za-z0-9_.])([A-Za-z0-9_.]*\.)?#{source}\(/) do |match|
+                  arg = ($2.nil? || $2.empty?) ? 'this' : $2[0..-2]
+                  "#{$1}#{player_name}.#{target}(#{arg}, "
+                end
+              end
+            when :stub_static
+              if stubs_enabled
+                line.gsub! /(^|[^A-Za-z0-9_.])([A-Za-z0-9_.]*\.)?#{source}\(/,
+                           "\\1#{player_name}.#{target}("
               end
             end
           end

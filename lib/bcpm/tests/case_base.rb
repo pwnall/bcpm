@@ -70,10 +70,20 @@ class CaseBase
       @env.file_op [:fragment, [target_class, target_fragment], [source_class, source_fragment]]
     end
     
-    # Redirects all method calls using a method name to a static method.
-    def stub_call(source, target)
+    # Redirects all method calls using a method name to a static method.    
+    #
+    # Assumes the target method is a member method, and passes "this" to the static method.
+    def stub_member_call(source, target)
       _env_change
-      @env.patch_op [:stub, target, source]
+      @env.patch_op [:stub_member, target, source]
+    end
+
+    # Redirects all method calls using a method name to a static method.
+    #
+    # Assumes the target method is a static method, and ignores the call target.
+    def stub_static_call(source, target)
+      _env_change
+      @env.patch_op [:stub_static, target, source]
     end
   
     # Create a test match. The block contains test cases for the match.

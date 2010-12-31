@@ -79,8 +79,12 @@ functionality available in a test suite. The suite DSL slightly resembles rspec.
     replace_class 'RobotPlayer', 'test.players.TestRobotPlayer'
     
     # Re-route all calls that look like target.canMove(...) to
-    # yield.test.LoggingStubs.canMoveStub(target, ...)
-    stub_call 'canMove', 'test.LoggingStubs.canMoveStub'
+    # yield.test.stubs.LoggingStubs.canMoveStub(target, ...)
+    stub_member_call 'canMove', 'test.stubs.LoggingStubs.canMoveStub'
+    
+    # Re-route all calls that look like target.wantStubbing(...) to
+    # yield.test.stubs.LoggingStubs.wantStubbingStub(...)
+    stub_static_call 'wantStubbing', 'test.stubs.LoggingStubs.wantStubbingStub'
     
     # Replace the code marked with Stubs.canMove.logo in yield.LoggingStubs with the code marked
     # Stubs.canMove.logoSource in yield.test.stubs.LoggingStubs
@@ -105,8 +109,9 @@ functionality available in a test suite. The suite DSL slightly resembles rspec.
     # Reset energon draining option to its default value.
     option 'bc.engine.upkeep', nil
 
-To prevent infinite recursion, stubbing should be disabled in the actual stubs. The stub
-implementation below demonstrates the syntax for stubbing and code replacement.
+To prevent infinite recursion, stubbing should be disabled in the actual stubs. To prevent
+compilation errors, stubbing should also be disabled on the first line of the stubbed method's
+definition. The stub implementation below demonstrates the syntax for stubbing and code replacement.
 
     package yield.test.stubs;
     
