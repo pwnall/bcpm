@@ -75,7 +75,7 @@ module CLI
         exit 1
       end 
       Bcpm::Player.reconfigure args[1]      
-    when 'match'  # Run a match in headless mode, dump the output to stdout.
+    when 'match', 'livematch'  # Run a match in live or headless mode.
       unless Bcpm::Dist.installed?
         puts "Please install a battlecode distribution first!"
         exit 1
@@ -90,7 +90,7 @@ module CLI
         puts "Please supply the player names and the map name!"
         exit 1
       end
-      puts Bcpm::Match.run(args[1], args[2], args[3])
+      puts Bcpm::Match.run(args[1], args[2], args[3], args[0][0, 4] == 'live')
     when 'replay'  # Replay a match using its binlog (.rms file).
       unless Bcpm::Dist.installed?
         puts "Please install a battlecode distribution first!"

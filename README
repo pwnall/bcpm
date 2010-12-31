@@ -32,7 +32,7 @@ If you go this route, you will have to create the git repositories yourself, and
 
     bcpm case yield win_vs_yield
     
-    # The following commands run the first match right away, for maximum iterating speed.
+    # The following command runs the first match right away, for maximum iterating speed.
     bcpm livecase yield win_vs_yield
 
 6. Replay the last match ran in a test.
@@ -42,6 +42,9 @@ If you go this route, you will have to create the git repositories yourself, and
 7. Run a game against some other player code.
 
     bcpm match yield team000 venice
+
+    # The following command runs the match right away, for maximum enjoyment.
+    bcpm livematch yield team000 venice
 
 8. Remove the installed player. (removing the project folder is not enough!)
 
