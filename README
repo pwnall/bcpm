@@ -4,23 +4,23 @@ USAGE
 
 1. Make sure you're using the latest tool version.
 
-   bcpm self
+    bcpm self
 
 2. Install the Battlecode distribution. Later, use the same command to update the distribution.
 
-   bcpm dist
+    bcpm dist
 
 3a. Check out a player repository and set it up for development.
 
-   cd ~/workspace  # Your Eclipse workspace.
-   bcpm install git@git.pwnb.us:six370/yield.git
+    cd ~/workspace  # Your Eclipse workspace.
+    bcpm install git@git.pwnb.us:six370/yield.git
 
 After executing the commands above, import the project into Eclipse
 (File > Import > Existing Projects into Workspace).
 
 3b. Create a blank player.
 
-   bcpm new team1337
+    bcpm new team1337
      
 If you go this route, you will have to create the git repositories yourself, and push them.
 
@@ -49,10 +49,13 @@ If you go this route, you will have to create the git repositories yourself, and
     
 9. Create a new player from an existing template.
 
-   bcpm copy myplayer git@git.pwnb.us:six370/yield.git
+    bcpm copy myplayer git@git.pwnb.us:six370/yield.git
 
 You'll need to import the project into Eclipse, and setup a git repository for the player.
 
+10. If bcpm crashes or you abort it, you'll need to clean up the temporaries left behind.
+
+    bcpm 
 
 TESTING
 
@@ -145,13 +148,13 @@ On Ubuntu:
 
 On OSX:
 
-   Get git from http://code.google.com/p/git-osx-installer/
+    Get git from http://code.google.com/p/git-osx-installer/
 
 On Windows 7+:
 
-   Get git from http://code.google.com/p/msysgit/downloads/
-   Get ruby 1.8.7 (add it to your path) from http://rubyinstaller.org/downloads/
-   Get ant from http://code.google.com/p/winant/
+    Get git from http://code.google.com/p/msysgit/downloads/
+    Get ruby 1.8.7 (add it to your path) from http://rubyinstaller.org/downloads/
+    Get ant from http://code.google.com/p/winant/
 
 On everything (skip the 'sudo' prefix on Windows though):
 

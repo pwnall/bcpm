@@ -1,4 +1,5 @@
 require 'English'
+require 'fileutils'
 require 'shellwords'
 require 'thread'
 require 'tmpdir'
@@ -26,8 +27,8 @@ module Match
   #   bc_options:: hash of simulator settings to be added to bc.conf
   def self.match_data(player1_name, player2_name, map_name, run_live, bc_options = {})
     uid = tempfile
-    tempdir = File.join Dir.tmpdir, uid
-    Dir.mkdir tempdir
+    tempdir = File.join Dir.tmpdir, 'bcpm', 'match_' + uid
+    FileUtils.mkdir_p tempdir
     textlog, binlog, antlog = nil, nil, nil, nil, nil
     Dir.chdir tempdir do
       filebase = Dir.pwd
@@ -63,8 +64,8 @@ module Match
   
   # Replays a match using the binlog (.rms file).
   def self.replay(binfile)
-    tempdir = File.join Dir.tmpdir, tempfile
-    Dir.mkdir tempdir
+    tempdir = File.join Dir.tmpdir, 'bcpm', 'match_' + tempfile
+    FileUtils.mkdir_p tempdir
     Dir.chdir tempdir do
       filebase = Dir.pwd
       match_log = File.join filebase, 'match.log'
@@ -180,7 +181,7 @@ END_CONFIG
         # Dump the build output to the screen as the simulation happens.
         print fragment
         STDOUT.flush
-        build_output << fragment        
+        build_output << fragment
       
         # Let bcpm carry on when the simulation completes.
         break if build_output.index(run_live)
@@ -210,7 +211,7 @@ END_CONFIG
   
   # Temporary file name.
   def self.tempfile
-    "match_#{(Time.now.to_f * 1000).to_i}_#{$PID}"
+    "#{(Time.now.to_f * 1000).to_i}_#{$PID}"
   end
 end  # module Bcpm::Match
 

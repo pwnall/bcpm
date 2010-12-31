@@ -184,7 +184,7 @@ class Environment
   # Returns true for success, false for failure.
   def build
     uid = 'build_' + player_name
-    tempdir = File.join Dir.tmpdir, uid
+    tempdir = File.join Dir.tmpdir, 'bcpm', uid
     FileUtils.mkdir_p tempdir
     Dir.chdir tempdir do
       filebase = Dir.pwd
@@ -227,7 +227,7 @@ class Environment
 
   # A player name guaranteed to be unique across the systme.
   def self.new_player_name
-    @prefix ||= "test_#{(Time.now.to_f * 1000).to_i}_#{$PID}"
+    @prefix ||= "bcpmtest_#{(Time.now.to_f * 1000).to_i}_#{$PID}"
     @counter ||= 0
     @counter += 1
     "#{@prefix}_#{@counter}"

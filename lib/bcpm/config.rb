@@ -4,7 +4,7 @@ require 'yaml'
 module Bcpm
 
 # Persistent, per-user bcpm configuration information.
-module Config  
+module Config
   # Hash-style access to the configuration dictionary.
   def self.[](key)
     config[key.to_sym]

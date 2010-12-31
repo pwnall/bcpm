@@ -141,7 +141,6 @@ module Player
   def self.has_suite?(local_path)
     File.exist? File.join(local_path, 'suite')
   end
-  
 
   # Configures a player's source code project.
   def self.configure(local_path)
@@ -171,6 +170,15 @@ module Player
       exit 1
     end
     path
+  end
+  
+  # All installed players.
+  #
+  # This might contain false positives.
+  def self.list
+    Dir.glob(File.join(local_root, '*', '.project')).map do |project_file|
+      File.basename File.dirname(project_file)
+    end
   end
   
   # Extracts the player name out of the git repository URI for the player's code.

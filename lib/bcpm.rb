@@ -4,6 +4,7 @@
 module Bcpm  
 end
 
+require 'bcpm/cleanup.rb'
 require 'bcpm/cli.rb'
 require 'bcpm/config.rb'
 require 'bcpm/dist.rb'

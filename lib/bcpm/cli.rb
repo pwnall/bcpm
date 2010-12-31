@@ -140,6 +140,10 @@ module CLI
         exit 1
       end
       Bcpm::Player.run_case args[2], args[0][0, 4] == 'live', args[1]
+    
+    when 'clean', 'cleanup'  # Removes all temporaries left behind by crashes.
+      Bcpm::Cleanup.run
+      
     else
       help
       exit 1
@@ -155,6 +159,6 @@ See the README file for usage instructions.
 
 END_HELP
   end
-end
+end  # module Bcpm::CLI
   
 end  # namespace Bcpm

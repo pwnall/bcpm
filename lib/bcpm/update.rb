@@ -19,8 +19,8 @@ module Update
     
   # Temporary directory name.
   def self.tempdir
-    File.join Dir.tmpdir, "bcpm_#{(Time.now.to_f * 1000).to_i}_#{$PID}"
-  end  
+    File.join Dir.tmpdir, 'bcpm', "update_#{(Time.now.to_f * 1000).to_i}_#{$PID}"
+  end
 
   # Git URI to the bcpm repository.
   def self.repo_uri
