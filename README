@@ -101,6 +101,16 @@ functionality available in a test suite. The suite DSL slightly resembles rspec.
         should_not_throw
       end
       
+      it 'should stub the member call' do
+        should_match_unit_output(/This should show up/)
+      end
+      
+      it 'should stub the static call' do
+        should_match_unit_output(/wantStubbing\: this (.*) be printed/) do |unit, match|
+          fail 'Static call not stubbed' unless match[1] == 'should'
+        end
+      end
+      
       it 'should fail' do
         fail
       end
