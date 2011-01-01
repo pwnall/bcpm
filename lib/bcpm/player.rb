@@ -9,8 +9,6 @@ module Player
   #
   # Returns the player's name, or nil if something went wrong.
   def self.install(repo_uri, repo_branch)
-    repo_branch ||= 'master'
-
     name = player_name repo_uri
     local_path = File.join local_root, name    
     if File.exist?(local_path)
