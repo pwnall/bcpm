@@ -186,6 +186,7 @@ END_CONFIG
         # Let bcpm carry on when the simulation completes.
         break if build_output.index(run_live)
       end
+      build_output << "\n" if build_output[-1] != ?\n
       
       # Pretend everything was put in a log file.
       File.open(log_file, 'wb') { |f| f.write build_output }

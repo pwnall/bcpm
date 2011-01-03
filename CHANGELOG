@@ -1,3 +1,5 @@
+v0.9.7. Fixes for ruby1.9 and OSX.
+
 v0.9.6. match_unit_output assertion.
 
 v0.9.5. stub_call turned into stub_member_call and stub_static_call.

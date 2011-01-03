@@ -67,7 +67,7 @@ module CLI
       
       if args.length == 1
         # Try using the current dir as the player name.
-        args[1, 0] = [File.basename Dir.pwd]
+        args[1, 0] = [File.basename(Dir.pwd)]
       end
 
       if args.length < 2
@@ -83,7 +83,7 @@ module CLI
       
       if args.length == 3
         # Try using the current dir as a player name.
-        args[1, 0] = [File.basename Dir.pwd]
+        args[1, 0] = [File.basename(Dir.pwd)]
       end
       
       if args.length < 4
@@ -116,7 +116,7 @@ module CLI
 
       if args.length == 1
         # Try using the current dir as the player name.
-        args[1, 0] = [File.basename Dir.pwd]
+        args[1, 0] = [File.basename(Dir.pwd)]
       end
 
       if args.length < 2
@@ -132,7 +132,7 @@ module CLI
       
       if args.length == 2
         # Try using the current dir as the player name.
-        args[1, 0] = [File.basename Dir.pwd]
+        args[1, 0] = [File.basename(Dir.pwd)]
       end
 
       if args.length < 3
