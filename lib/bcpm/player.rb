@@ -182,8 +182,8 @@ module Player
   # Cleans up all the installed players.
   def self.uninstall_all
     list.each do |player_name|
-      local_path = File.join local_root, local_name
-      next unless Bcpm::Dist.contains_player? path
+      local_path = File.join local_root, player_name
+      next unless Bcpm::Dist.contains_player? local_path
       uninstall player_name
     end
   end
