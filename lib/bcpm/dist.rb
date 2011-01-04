@@ -99,7 +99,7 @@ module Dist
   
   # Git URI to the distribution repository.  
   def self.default_repo_uri
-    'git@git.pwnb.us:six370/battlecode2010.git'
+    'git@git.pwnb.us:six370/battlecode2011.git'
   end
 end
 
