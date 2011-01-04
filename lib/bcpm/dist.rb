@@ -39,7 +39,7 @@ module Dist
     else
       File.exist?(team_path) && File.symlink?(team_path) && File.readlink(team_path) == player_path
     end
-  end  
+  end
   
   # Upgrades the installed battlecode distribution to the latest version.
   #

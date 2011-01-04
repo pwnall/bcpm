@@ -14,7 +14,7 @@ module Player
     if File.exist?(local_path)
       puts "Player already installed at #{local_path}!"
       return nil
-    end    
+    end
     return nil unless Bcpm::Git.clone_repo(repo_uri, repo_branch, local_path)
     
     unless source_path = package_path(local_path)
@@ -183,7 +183,8 @@ module Player
   def self.uninstall_all
     list.each do |player_name|
       local_path = File.join local_root, player_name
-      next unless Bcpm::Dist.contains_player? local_path
+      source_path = package_path local_path, nil, true
+      next unless source_path && Bcpm::Dist.contains_player?(source_path)
       uninstall player_name
     end
   end
@@ -218,11 +219,12 @@ module Player
   #   local_path:: path to the player's git repository on the local machine
   #   name_override:: (optional) supplies the player name; if not set, the name is extracted from
   #                   the path, by convention 
-  def self.package_path(local_path, name_override = nil)
+  #   silent:: if set, won't output errors that help the user debug the problem
+  def self.package_path(local_path, name_override = nil, silent = false)
     # All the packages should be in the 'src' directory.
     source_dir = File.join local_path, 'src'
     unless File.exist? source_dir
-      puts "Missing src directory"
+      puts "Missing src directory" unless silent
       return nil
     end
     
@@ -230,13 +232,13 @@ module Player
     package_dirs = Dir.glob(File.join(source_dir, '*')).
                        reject { |path| File.basename(path)[0, 1] == '.' }
     unless package_dirs.length == 1
-      puts "src directory doesn't contain exactly one package directory!"
+      puts "src directory doesn't contain exactly one package directory!" unless silent
       return nil
     end
 
     path = package_dirs.first
     unless (name_override || File.basename(local_path)) == File.basename(path)
-      puts "The package in the src directory doesn't match the player name!"
+      puts "The package in the src directory doesn't match the player name!" unless silent
       return nil
     end
     path
