@@ -1,3 +1,5 @@
+v0.9.8. reset command.
+
 v0.9.7. Fixes for ruby1.9 and OSX.
 
 v0.9.6. match_unit_output assertion.

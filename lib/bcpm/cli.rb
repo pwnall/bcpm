@@ -15,6 +15,11 @@ module CLI
       Bcpm::Update.upgrade
     when 'dist'  # Install or upgrade the battlecode distribution.
       Bcpm::Dist.upgrade
+    when 'reset'  # Uninstalls the distribution and players, and removes the config file.
+      Bcpm::Cleanup.run
+      Bcpm::Player.uninstall_all
+      Bcpm::Dist.uninstall
+      Bcpm::Config.reset
     when 'install'  # Add a player project to the workspace, from a git repository.
       unless Bcpm::Dist.installed?
         puts "Please install a battlecode distribution first!"

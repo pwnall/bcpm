@@ -12,7 +12,11 @@ module Config
   
   # Hash-style access to configuration dictionary.
   def self.[]=(key, new_value)
-    config[key.to_sym] = new_value
+    if new_value.nil?
+      config.delete key.to_sym
+    else
+      config[key.to_sym] = new_value      
+    end
     write_config
   end
   
@@ -38,6 +42,12 @@ module Config
   # Path to the configuration YAML file.
   def self.config_file
     File.expand_path '~/.bcpm_config'
+  end
+  
+  # Removes the configuration YAML file and resets the configuration hash.
+  def self.reset
+    File.unlink config_file if File.exist?(config_file)
+    @config = nil
   end
 end  # module Bcpm::Config
 

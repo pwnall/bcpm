@@ -58,7 +58,12 @@ You'll need to import the project into Eclipse, and setup a git repository for t
 
 10. If bcpm crashes or you abort it, you'll need to clean up the temporaries left behind.
 
-    bcpm 
+    bcpm clean
+    
+11. After winning the competition, remove the players and distribution. Commit and push first!
+
+    bcpm reset
+
 
 TESTING
 

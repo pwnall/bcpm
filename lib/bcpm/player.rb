@@ -179,6 +179,15 @@ module Player
     end
   end
   
+  # Cleans up all the installed players.
+  def self.uninstall_all
+    list.each do |player_name|
+      local_path = File.join local_root, local_name
+      next unless Bcpm::Dist.contains_player? path
+      uninstall player_name
+    end
+  end
+
   # Extracts the player name out of the git repository URI for the player's code.
   def self.player_name(repo_uri)
     name = File.basename(repo_uri)

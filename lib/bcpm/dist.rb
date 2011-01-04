@@ -17,23 +17,29 @@ module Dist
       FileUtils.ln_s player_path, team_path
     end
   end
-
+  
   # Unhooks a player's code from the installed battlecode distribution.
   def self.remove_player(player_path)
+    return unless contains_player?(player_path)
     team_path = File.join dist_path, 'teams', File.basename(player_path)
     if /mingw/ =~ RUBY_PLATFORM || (/win/ =~ RUBY_PLATFORM && /darwin/ !~ RUBY_PLATFORM)
-      return unless File.exist?(team_path)
       Dir.rmdir team_path
     else
-      unless File.exist?(team_path) && File.symlink?(team_path) &&
-             File.readlink(team_path) == player_path   
-        return
-      end
       File.unlink team_path
     end
     bin_path = File.join dist_path, 'bin', File.basename(player_path)
     FileUtils.rm_rf bin_path if File.exist?(bin_path)
   end
+
+  # True if the given path is a player that is hooked into the distribution.
+  def self.contains_player?(player_path)
+    team_path = File.join dist_path, 'teams', File.basename(player_path)
+    if /mingw/ =~ RUBY_PLATFORM || (/win/ =~ RUBY_PLATFORM && /darwin/ !~ RUBY_PLATFORM)
+      File.exist? team_path
+    else
+      File.exist?(team_path) && File.symlink?(team_path) && File.readlink(team_path) == player_path
+    end
+  end  
   
   # Upgrades the installed battlecode distribution to the latest version.
   #
@@ -54,7 +60,14 @@ module Dist
   def self.installed?
     Bcpm::Config.config.has_key? :dist_path
   end
-    
+  
+  # Removes the battlecode distribution installed on the location machine.
+  def self.uninstall
+    return unless installed?
+    FileUtils.rm_rf dist_path
+    Bcpm::Config[:dist_path] = nil
+  end
+  
   # Path to the battlecode ant file.
   def self.ant_file
     File.join dist_path, 'build.xml'
