@@ -258,7 +258,7 @@ module Player
 
   # The contents of an Eclipse .classpath for a player project.  
   def self.eclipse_classpath(local_path)
-    jar_path = File.join Bcpm::Dist.dist_path, 'lib', 'battlecode.jar'
+    jar_path = File.join Bcpm::Dist.dist_path, 'lib', 'battlecode-server.jar'
     
     <<END_CONFIG
 <?xml version="1.0" encoding="UTF-8"?>
