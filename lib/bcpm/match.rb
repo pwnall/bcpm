@@ -90,6 +90,7 @@ module Match
       'bc.dialog.skip' => true,
       'bc.server.throttle' => 'yield',
       'bc.server.throttle-count' => 100000,
+      'bc.client.opengl' => Bcpm::Config[:client3d],
       
       # Healthy production defaults.
       'bc.engine.breakpoints' => false,

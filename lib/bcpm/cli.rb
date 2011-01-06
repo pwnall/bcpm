@@ -148,7 +148,13 @@ module CLI
     
     when 'clean', 'cleanup'  # Removes all temporaries left behind by crashes.
       Bcpm::Cleanup.run
+    
+    when 'client3d'  # Enables or disables 3D.
+      if args.length < 2
+        puts "Please indicate whether you want 3D on or off."
+      end
       
+      Bcpm::Config[:client3d] = !['off', 'false'].include?(args[1].downcase)
     else
       help
       exit 1
