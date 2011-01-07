@@ -27,7 +27,6 @@ module Assertions
       raise Bcpm::Tests::AssertionError, "Player should not have thrown exceptions! " +
           "It threw #{$1}Exception#{$2}"
     end
-    puts match.chatter
     if match.chatter.index(/\n(\S*)Exception(.*?)\n\S/m)
       raise Bcpm::Tests::AssertionError, "Player should not have thrown exceptions! " +
           "It threw #{$1}Exception#{$2}"
