@@ -22,7 +22,7 @@ class TestMatch
 
   # Match output. Nil if the match hasn't completed.
   attr_reader :output
-  
+    
   # Detailed match data.
   attr_reader :data
 
@@ -59,6 +59,11 @@ class TestMatch
   # The match output, split into lines.
   def output_lines
     @output_lines ||= output.split("\n")
+  end
+  
+  # The output printed by map units, without the [source] prefixess.
+  def chatter
+    @chatter ||= output_lines.map { |line| line.gsub /^\[[^\]]+\]\s/, '' }.reject(&:empty?).join("\n")
   end
   
   # The output line showing who won the game.
