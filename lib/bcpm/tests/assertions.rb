@@ -8,7 +8,7 @@ module Tests
 module Assertions  
   # Fails unless the match was won.
   def should_win
-    return if match.outcome.index(' (A) wins')
+    return if match.outcome.index(" (#{match.side.to_s.upcase}) wins")
     raise Bcpm::Tests::AssertionError, "Player was expected to win, but didn't! " + match.outcome
   end
 

@@ -13,6 +13,7 @@ class CaseBase
     def _setup
       @map = nil
       @vs = nil
+      @side = :a
       @match = nil      
       @options = {}
       @env = Bcpm::Tests::Environment.new
@@ -47,6 +48,11 @@ class CaseBase
     # Set the enemy for following matches.
     def vs(player_name)
       @vs = player_name.dup.to_s
+    end
+    
+    # Set our side for the following matches.
+    def side(side)
+      @side = side.to_s.downcase.to_sym
     end
     
     # Set a simulation option.
@@ -90,7 +96,7 @@ class CaseBase
     def match(&block)
       begin
         @env_used = true
-        @match = Bcpm::Tests::TestMatch.new @vs, @map, @env, @options
+        @match = Bcpm::Tests::TestMatch.new @side, @vs, @map, @env, @options
         self.class_eval(&block)
         @matches << @match
       ensure

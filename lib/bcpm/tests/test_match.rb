@@ -10,6 +10,8 @@ module Tests
 #
 # Each test case is its own anonymous class.
 class TestMatch
+  # Side of the tested player in the match.
+  attr_reader :side
   # Name of opposing player in the match.
   attr_reader :vs  
   # Name of map for the match.
@@ -27,7 +29,8 @@ class TestMatch
   attr_reader :data
 
   # Skeleton for a match.
-  def initialize(vs, map, environment, options = {})
+  def initialize(side, vs, map, environment, options = {})
+    @side = side
     @vs = vs
     @map = map
     @options = options.clone
@@ -38,7 +41,12 @@ class TestMatch
   
   # Run the game.
   def run(live = false)
-    @data = Bcpm::Match.match_data @environment.player_name, @vs, @map, live, @options
+    case @side
+    when :a
+      @data = Bcpm::Match.match_data @environment.player_name, @vs, true, @map, live, @options
+    when :b
+      @data = Bcpm::Match.match_data @vs, @environment.player_name, false, @map, live, @options
+    end
     @output = data[:ant]
   end
 
@@ -49,7 +57,7 @@ class TestMatch
 
   # User-readable description of match conditions.
   def description
-    desc = "vs #{vs} on #{map}"
+    desc = "as team #{side.to_s.upcase} vs #{vs} on #{map}"
     unless @options.empty?
       desc += ' with ' + options.map { |k, v| "#{k}=#{v}" }.join(",")
     end

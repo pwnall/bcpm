@@ -12,7 +12,7 @@ module Match
   # Runs a match between two players.
   def self.run(player1_name, player2_name, map_name, live)
     env = Bcpm::Tests::Environment.new player1_name
-    match = Bcpm::Tests::TestMatch.new player2_name, map_name, env
+    match = Bcpm::Tests::TestMatch.new :a, player2_name, map_name, env
     match.run live
     match.stash_data
   end
@@ -22,10 +22,11 @@ module Match
   # Args:
   #   player1_name:: name of locally installed player (A)
   #   player2_name:: name of locally installed player (B)
+  #   silence_b:: if true, B is silenced; otherwise, A is silenced
   #   map_name:: name of map .xml file
   #   run_live:: if true, tries to run the match using the live UI
   #   bc_options:: hash of simulator settings to be added to bc.conf
-  def self.match_data(player1_name, player2_name, map_name, run_live, bc_options = {})
+  def self.match_data(player1_name, player2_name, silence_b, map_name, run_live, bc_options = {})
     uid = tempfile
     tempdir = File.join Dir.tmpdir, 'bcpm', 'match_' + uid
     FileUtils.mkdir_p tempdir
@@ -38,7 +39,7 @@ module Match
       match_log = File.join filebase, 'match.log'
       scribe_log = File.join filebase, 'scribe.log' 
 
-      bc_config = simulator_config(player1_name, player2_name, map_name, binfile, txtfile)
+      bc_config = simulator_config player1_name, player2_name, silence_b, map_name, binfile, txtfile
       bc_config.merge! bc_options
       conf_file = File.join filebase, 'bc.conf'      
       write_config conf_file, bc_config
@@ -83,10 +84,10 @@ module Match
   end
   
   # Options to be overridden for the battlecode simulator.
-  def self.simulator_config(player1_name, player2_name, map_name, binfile, txtfile)
+  def self.simulator_config(player1_name, player2_name, silence_b, map_name, binfile, txtfile)
     config = {
-      'bc.engine.silence-a' => false,
-      'bc.engine.silence-b' => true,
+      'bc.engine.silence-a' => !silence_b,
+      'bc.engine.silence-b' => !!silence_b,
       'bc.dialog.skip' => true,
       'bc.server.throttle' => 'yield',
       'bc.server.throttle-count' => 100000,
