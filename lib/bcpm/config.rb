@@ -49,6 +49,52 @@ module Config
     File.unlink config_file if File.exist?(config_file)
     @config = nil
   end
+  
+  # Outputs the configuration.
+  def self.print_config
+    config.keys.sort.each do |key|
+      print "#{key}: #{config[key]}\n"
+    end
+  end
+  
+  # Executes a config command from the UI.
+  def self.ui_set(key, value)    
+    # Normalize values.
+    case value && value.downcase
+    when 'on', 'true'
+      value = true
+    when 'off', 'false'
+      value = false
+    end
+    
+    # Process keys that include values.
+    prefix = key[0]
+    
+    toggle = false
+    if [?+, ?-, ?^].include? prefix
+      key = key[1..-1]
+      case prefix
+      when ?+
+        value = true
+      when ?-
+        value = false
+      when ?^
+        toggle = true
+      end
+      self[key]
+    end
+    
+    # Normalize keys.
+    key = key.downcase
+    
+    # Execute the configuration change.
+    if toggle
+      self[key] = !self[key]
+    else
+      self[key] = value
+    end
+    print "#{key} set to #{value}\n"
+  end
 end  # module Bcpm::Config
 
 end  # namespace Bcpm

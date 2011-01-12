@@ -10,10 +10,21 @@ module Bcpm
 # Runs matches between players.
 module Match
   # Runs a match between two players.
-  def self.run(player1_name, player2_name, map_name, live)
+  def self.run(player1_name, player2_name, map_name, mode)
     env = Bcpm::Tests::Environment.new player1_name
-    match = Bcpm::Tests::TestMatch.new :a, player2_name, map_name, env
-    match.run live
+    options = {}
+    if mode == :debug
+      Bcpm::Config[:breakpoints] ||= true
+      Bcpm::Config[:debugcode] ||= true
+      Bcpm::Config[:noupkeep] ||= false
+      options = {
+        'bc.engine.breakpoints' => Bcpm::Config[:breakpoints],
+        'bc.engine.debug-methods' => Bcpm::Config[:debugcode],
+        'bc.engine.upkeep' => Bcpm::Config[:noupkeep]
+      }
+    end
+    match = Bcpm::Tests::TestMatch.new :a, player2_name, map_name, env, options
+    match.run(mode != :file)
     match.stash_data
   end
   

@@ -37,8 +37,10 @@ If you go this route, you will have to create the git repositories yourself, and
 
 6. Switch between the 2D and the 3D client.
 
-    bcpm client3d on
-    bcpm client3d off
+    bcpm set client3d on
+    bcpm set +client3d
+    bcpm set client3d off
+    bcpm set -client3d
 
 7. Replay the last match ran in a test.
 
@@ -51,21 +53,38 @@ If you go this route, you will have to create the git repositories yourself, and
     # The following command runs the match right away, for maximum enjoyment.
     bcpm livematch yield team000 venice
 
-9. Remove the installed player. (removing the project folder is not enough!)
+9. Run a debugging game against some other player code. Debugging games us use bcpm configuration settings instead of production defaults.
+
+    bcpm debugmatch yield team000 venice
+    
+10. Show all settings.
+
+    bcpm config
+    
+11. Change debugging settings
+
+    bcpm set +noupkeep
+    bcpm set -noupkeep
+    bcpm set +debugcode
+    bcpm set -debugcode
+    bcpm set +breakpoints
+    bcpm set -breakpoints
+ 
+12. Remove the installed player. (removing the project folder is not enough!)
 
     bcpm uninstall yield
     
-10. Create a new player from an existing template.
+13. Create a new player from an existing template.
 
     bcpm copy myplayer git@git.pwnb.us:six370/yield.git
 
 You'll need to import the project into Eclipse, and setup a git repository for the player.
 
-11. If bcpm crashes or you abort it, you'll need to clean up the temporaries left behind.
+14. If bcpm crashes or you abort it, you'll need to clean up the temporaries left behind.
 
     bcpm clean
     
-12. After winning the competition, remove the players and distribution. Commit and push first!
+15. After winning the competition, remove the players and distribution. Commit and push first!
 
     bcpm reset
 

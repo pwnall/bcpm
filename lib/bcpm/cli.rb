@@ -64,7 +64,7 @@ module CLI
         exit 1
       end 
       Bcpm::Player.uninstall args[1]
-    when 'rewire', 'config'  # Re-write a player project's configuration files.
+    when 'rewire'  # Re-write a player project's configuration files.
       unless Bcpm::Dist.installed?
         puts "Please install a battlecode distribution first!"
         exit 1
@@ -80,7 +80,7 @@ module CLI
         exit 1
       end 
       Bcpm::Player.reconfigure args[1]      
-    when 'match', 'livematch'  # Run a match in live or headless mode.
+    when 'match', 'livematch', 'debugmatch', 'debug'  # Run a match in live or headless mode.
       unless Bcpm::Dist.installed?
         puts "Please install a battlecode distribution first!"
         exit 1
@@ -95,7 +95,14 @@ module CLI
         puts "Please supply the player names and the map name!"
         exit 1
       end
-      puts Bcpm::Match.run(args[1], args[2], args[3], args[0][0, 4] == 'live')
+      mode = if args[0][0, 4] == 'live'
+        :live
+      elsif args[0][0, 5] == 'debug'
+        :debug
+      else
+        :file
+      end
+      puts Bcpm::Match.run(args[1], args[2], args[3], mode)
     when 'replay'  # Replay a match using its binlog (.rms file).
       unless Bcpm::Dist.installed?
         puts "Please install a battlecode distribution first!"
@@ -149,12 +156,12 @@ module CLI
     when 'clean', 'cleanup'  # Removes all temporaries left behind by crashes.
       Bcpm::Cleanup.run
     
-    when 'client3d'  # Enables or disables 3D.
+    when 'config', 'set'
       if args.length < 2
-        puts "Please indicate whether you want 3D on or off."
+        Bcpm::Config.print_config
+      else
+        Bcpm::Config.ui_set(args[1], args[2])
       end
-      
-      Bcpm::Config[:client3d] = !['off', 'false'].include?(args[1].downcase)
     else
       help
       exit 1

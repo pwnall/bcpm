@@ -92,7 +92,7 @@ module Player
   def self.reconfigure(local_name)
     local_path = File.join local_root, local_name
     unless source_path = package_path(local_path)
-      puts "Repository #{repo_uri} doesn't seem to contain a player!"
+      puts "Directory #{local_path} doesn't seem to contain a player!"
       FileUtils.rm_rf local_path      
       return nil
     end
