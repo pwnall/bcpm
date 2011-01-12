@@ -1,3 +1,7 @@
+v0.9.14. Bugfix in rewire.
+
+v0.9.13. Bugfix in replay.
+
 v0.9.12. Added side in test description.
 
 v0.9.11. Bugfix in should_throw assertion.

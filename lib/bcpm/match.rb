@@ -71,7 +71,7 @@ module Match
       filebase = Dir.pwd
       match_log = File.join filebase, 'match.log'
 
-      bc_config = simulator_config(nil, nil, nil, binfile, nil)
+      bc_config = simulator_config nil, nil, true, nil, binfile, nil
       conf_file = File.join filebase, 'bc.conf'      
       write_config conf_file, bc_config
       write_ui_config conf_file, false, bc_config
