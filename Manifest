@@ -11,6 +11,7 @@ lib/bcpm/dist.rb
 lib/bcpm/git.rb
 lib/bcpm/match.rb
 lib/bcpm/player.rb
+lib/bcpm/regen.rb
 lib/bcpm/tests/assertion_error.rb
 lib/bcpm/tests/assertions.rb
 lib/bcpm/tests/case_base.rb

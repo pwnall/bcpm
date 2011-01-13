@@ -162,6 +162,13 @@ module CLI
       else
         Bcpm::Config.ui_set(args[1], args[2])
       end
+      
+    when 'regen'  # Regenerates automatically generated source code.  
+      if args.length < 2
+        puts "Please supply the source file(s)."
+        exit 1        
+      end
+      Bcpm::Regen.run args[1..-1]
     else
       help
       exit 1

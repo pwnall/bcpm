@@ -84,8 +84,12 @@ You'll need to import the project into Eclipse, and setup a git repository for t
 14. If bcpm crashes or you abort it, you'll need to clean up the temporaries left behind.
 
     bcpm clean
+  
+15. Use directed find/replace to unroll loops.
+
+    bcpm regen src/yield/
     
-15. After winning the competition, remove the players and distribution. Commit and push first!
+16. After winning the competition, remove the players and distribution. Commit and push first!
 
     bcpm reset
 
@@ -187,6 +191,23 @@ expressions. Following these best practices should help avoid broken builds:
   * Class names should be unqualified, and imports should use fully qualified names.
   * Use the same class name (but different package names) in replace_class.
   * A replace_class source class should only depend on classes in other packages.
+
+
+DIRECTED FIND/REPLACE
+
+bcpm regen reads one or more source files and discovers tagged source blocks, then replaces matching
+target blocks while renaming tokens. The example below shows the syntax.
+    
+    System.out.print("Should show numbers 1-3 and letters A-C: ");
+    //$ +gen:source Numbers A 1
+    System.out.print("A 1 ");
+    //$ -gen:source
+    //$ +gen:target Numbers B 2
+    System.out.print("A 1 ");
+    //$ -gen:target
+    //$ +gen:target Numbers C 3
+    System.out.print("A 1 ");
+    //$ -gen:target
 
 
 INSTALLATION
