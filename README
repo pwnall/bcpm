@@ -87,7 +87,7 @@ You'll need to import the project into Eclipse, and setup a git repository for t
   
 15. Use directed find/replace to unroll loops.
 
-    bcpm regen src/yield/
+    bcpm regen bcpm regen src/yield/test/stubs/LoggingStubs.java
     
 16. After winning the competition, remove the players and distribution. Commit and push first!
 
