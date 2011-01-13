@@ -17,10 +17,12 @@ module Match
       Bcpm::Config[:breakpoints] ||= true
       Bcpm::Config[:debugcode] ||= true
       Bcpm::Config[:noupkeep] ||= false
+      Bcpm::Config[:debuglimit] ||= 100_000
       options = {
         'bc.engine.breakpoints' => Bcpm::Config[:breakpoints],
         'bc.engine.debug-methods' => Bcpm::Config[:debugcode],
-        'bc.engine.upkeep' => Bcpm::Config[:noupkeep]
+        'bc.engine.upkeep' => Bcpm::Config[:noupkeep],
+        'bc.engine.debug-max-bytecodes' => Bcpm::Config[:debuglimit]
       }
     end
     match = Bcpm::Tests::TestMatch.new :a, player2_name, map_name, env, options

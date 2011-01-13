@@ -69,7 +69,8 @@ If you go this route, you will have to create the git repositories yourself, and
     bcpm set -debugcode
     bcpm set +breakpoints
     bcpm set -breakpoints
- 
+    bcpm set debuglimit 1000000  # Maximum number of bytecodes per round in debug_ methods.
+
 12. Remove the installed player. (removing the project folder is not enough!)
 
     bcpm uninstall yield
