@@ -1,3 +1,5 @@
+v0.10.1. Bugfix in config on Ruby 1.8.
+
 v0.10. Added regen command.
 
 v0.9.16. Added debuglimit config variable.

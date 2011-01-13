@@ -52,7 +52,7 @@ module Config
   
   # Outputs the configuration.
   def self.print_config
-    config.keys.sort.each do |key|
+    config.keys.sort_by(&:to_s).each do |key|
       print "#{key}: #{config[key]}\n"
     end
   end
