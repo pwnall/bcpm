@@ -108,8 +108,8 @@ functionality available in a test suite. The suite DSL slightly resembles rspec.
     # Set the map for future matches.
     map 'venice'
     
-    # Disable energon draining.
-    option 'bc.engine.upkeep', false
+    # Disable energon draining. :upkeep is a synonym for 'bc.engine.upkeep'.
+    option :upkeep, false
     
     # Replace a .java file in the player under test with a .java file in the test suite.
     # Both names are automatically prefixed with the team package ('yield.' in this case).
