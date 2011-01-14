@@ -57,6 +57,8 @@ class CaseBase
     
     # Set a simulation option.
     def option(key, value)
+      key = Bcpm::Match.engine_options[key.to_s] if key.kind_of? Symbol
+      
       if value.nil?
         @options.delete key
       else

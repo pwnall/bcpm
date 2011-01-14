@@ -17,17 +17,22 @@ module Match
       Bcpm::Config[:breakpoints] ||= true
       Bcpm::Config[:debugcode] ||= true
       Bcpm::Config[:noupkeep] ||= false
-      Bcpm::Config[:debuglimit] ||= 100_000
-      options = {
-        'bc.engine.breakpoints' => Bcpm::Config[:breakpoints],
-        'bc.engine.debug-methods' => Bcpm::Config[:debugcode],
-        'bc.engine.upkeep' => Bcpm::Config[:noupkeep],
-        'bc.engine.debug-max-bytecodes' => Bcpm::Config[:debuglimit]
-      }
+      Bcpm::Config[:debuglimit] ||= 1_000_000
+      options = Hash[engine_options.map { |k, v| [v, Bcpm::Config[k]] }]
     end
     match = Bcpm::Tests::TestMatch.new :a, player2_name, map_name, env, options
     match.run(mode != :file)
     match.stash_data
+  end
+  
+  # Key-value pairs for friendly => canonical names of battlecode engine options.
+  def self.engine_options
+    {
+      'breakpoints' => 'bc.engine.breakpoints',
+      'debugcode' => 'bc.engine.debug-methods',
+      'noupkeep' => 'bc.engine.upkeep',
+      'debuglimit' => 'bc.engine.debug-max-bytecodes'
+    }
   end
   
   # Runs a match between two players and returns the log data.
