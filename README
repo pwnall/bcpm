@@ -203,7 +203,7 @@ target blocks while renaming tokens. The example below shows the syntax.
     System.out.print("A 1 ");
     //$ +gen:off
     // This used to be System.out.print("A 1");
-    //$ -gen:off    
+    //$ -gen:off
     //$ -gen:source
     //$ +gen:target Numbers B 2
     //$ -gen:target
