@@ -70,10 +70,12 @@ module Regen
               print "Source: #{vars.join(' ')}\nTarget: #{vars.join(' ')}\n"
               exit 1
             end
-            
+
+            source_target = Hash[source_vars.zip(target_vars)]
+            regexp = Regexp.new source_vars.map { |var| "(#{var})" }.join('|')
             new_lines = source_lines[current_block].map &:dup
-            source_vars.each_with_index do |source_var, i|
-              new_lines.each { |line| line.gsub! source_var, target_vars[i] }
+            new_lines.each do |line|
+              line.gsub!(regexp) { |match| source_target[match] }
             end
             output_lines.concat new_lines
           end

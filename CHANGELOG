@@ -1,3 +1,5 @@
+v0.10.3. Smarter variable replacement in regen.
+
 v0.10.2. Testcase options can use friendlier symbols instead of battlecode engine strings.
 
 v0.10.1. Bugfix in config on Ruby 1.8.
