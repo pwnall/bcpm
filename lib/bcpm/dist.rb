@@ -8,12 +8,14 @@ module Bcpm
 module Dist
   # Hooks a player's code into the installed battlecode distribution.
   def self.add_player(player_path)
-    team_path = File.join dist_path, 'teams', File.basename(player_path)
+    team_path = File.join dist_path, 'teams', File.basename(player_path)    
     if /mingw/ =~ RUBY_PLATFORM || (/win/ =~ RUBY_PLATFORM && /darwin/ !~ RUBY_PLATFORM)
+      Dir.rmdir team_path if File.exist? team_path
       command = Shellwords.shelljoin(['cmd', '/C', 'mklink', '/D', team_path.gsub('/', '\\'),
                                       player_path.gsub('/', '\\')])
       Kernel.`(command)
     else
+      File.unlink team_path if File.exist? team_path
       FileUtils.ln_s player_path, team_path
     end
   end
