@@ -1,3 +1,5 @@
+v0.10.5. Added gen:off regen directive.
+
 v0.10.4. Bugfix in rewire.
 
 v0.10.3. Smarter variable replacement in regen.

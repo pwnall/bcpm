@@ -201,9 +201,11 @@ target blocks while renaming tokens. The example below shows the syntax.
     System.out.print("Should show numbers 1-3 and letters A-C: ");
     //$ +gen:source Numbers A 1
     System.out.print("A 1 ");
+    //$ +gen:off
+    // This used to be System.out.print("A 1");
+    //$ -gen:off    
     //$ -gen:source
     //$ +gen:target Numbers B 2
-    System.out.print("A 1 ");
     //$ -gen:target
     //$ +gen:target Numbers C 3
     System.out.print("A 1 ");

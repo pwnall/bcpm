@@ -47,6 +47,7 @@ module Regen
       output_lines = []
       
       current_block = nil
+      disabled = false
       lines.each do |line|
         if current_block
           if /^\s+\/\/\$\s+\-gen\:target(\s.*)?$/ =~ line
@@ -74,8 +75,17 @@ module Regen
             source_target = Hash[source_vars.zip(target_vars)]
             regexp = Regexp.new source_vars.map { |var| "(#{var})" }.join('|')
             new_lines = source_lines[current_block].map &:dup
+            disabled = false
             new_lines.each do |line|
-              line.gsub!(regexp) { |match| source_target[match] }
+              if disabled
+                disabled = false if /^\s+\/\/\$\s+\-gen\:off(\s.*)?$/ =~ line
+              else
+                if /^\s+\/\/\$\s+\+gen\:off(\s.*)?$/ =~ line
+                  disabled = true
+                else
+                  line.gsub!(regexp) { |match| source_target[match] }
+                end
+              end
             end
             output_lines.concat new_lines
           end
