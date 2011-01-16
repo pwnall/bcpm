@@ -185,14 +185,20 @@ module Player
     end
   end
   
-  # Cleans up all the installed players.
-  def self.uninstall_all
-    list.each do |player_name|
+  # All installed players who are properly hooked into the distribution.
+  #
+  # These players can be used into tests and simulations.
+  def self.list_active
+    list.select do |player_name|
       local_path = File.join local_root, player_name
       source_path = package_path local_path, nil, true
-      next unless source_path && Bcpm::Dist.contains_player?(source_path)
-      uninstall player_name
+      source_path && Bcpm::Dist.contains_player?(source_path)
     end
+  end
+  
+  # Cleans up all the installed players.
+  def self.uninstall_all
+    list_good.each { |player_name| uninstall player_name }
   end
 
   # Extracts the player name out of the git repository URI for the player's code.

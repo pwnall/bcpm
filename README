@@ -24,44 +24,49 @@ After executing the commands above, import the project into Eclipse
      
 If you go this route, you will have to create the git repositories yourself, and push them.
 
-4. Run the player's test suite.
+4. Confirm that the player is installed.
+
+    bcpm list
+    bcpm ls
+
+5. Run the player's test suite.
 
     bcpm test yield
 
-5. Run a single test case in the player's test suite.
+6. Run a single test case in the player's test suite.
 
     bcpm case yield win_vs_yield
     
     # The following command runs the first match right away, for maximum iterating speed.
     bcpm livecase yield win_vs_yield
 
-6. Switch between the 2D and the 3D client.
+7. Switch between the 2D and the 3D client.
 
     bcpm set client3d on
     bcpm set +client3d
     bcpm set client3d off
     bcpm set -client3d
 
-7. Replay the last match ran in a test.
+8. Replay the last match ran in a test.
 
     bcpm replay
 
-8. Run a game against some other player code.
+9. Run a game against some other player code.
 
     bcpm match yield team000 venice
 
     # The following command runs the match right away, for maximum enjoyment.
     bcpm livematch yield team000 venice
 
-9. Run a debugging game against some other player code. Debugging games us use bcpm configuration settings instead of production defaults.
+10. Run a debugging game against some other player code. Debugging games us use bcpm configuration settings instead of production defaults.
 
     bcpm debugmatch yield team000 venice
     
-10. Show all settings.
+11. Show all settings.
 
     bcpm config
     
-11. Change debugging settings
+12. Change debugging settings
 
     bcpm set +noupkeep
     bcpm set -noupkeep
@@ -71,25 +76,25 @@ If you go this route, you will have to create the git repositories yourself, and
     bcpm set -breakpoints
     bcpm set debuglimit 1000000  # Maximum number of bytecodes per round in debug_ methods.
 
-12. Remove the installed player. (removing the project folder is not enough!)
+13. Remove the installed player. (removing the project folder is not enough!)
 
     bcpm uninstall yield
     
-13. Create a new player from an existing template.
+14. Create a new player from an existing template.
 
     bcpm copy myplayer git@git.pwnb.us:six370/yield.git
 
 You'll need to import the project into Eclipse, and setup a git repository for the player.
 
-14. If bcpm crashes or you abort it, you'll need to clean up the temporaries left behind.
+15. If bcpm crashes or you abort it, you'll need to clean up the temporaries left behind.
 
     bcpm clean
   
-15. Use directed find/replace to unroll loops.
+16. Use directed find/replace to unroll loops.
 
     bcpm regen bcpm regen src/yield/test/stubs/LoggingStubs.java
     
-16. After winning the competition, remove the players and distribution. Commit and push first!
+17. After winning the competition, remove the players and distribution. Commit and push first!
 
     bcpm reset
 

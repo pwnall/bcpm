@@ -79,7 +79,13 @@ module CLI
         puts "Please supply the player name!"
         exit 1
       end 
-      Bcpm::Player.reconfigure args[1]      
+      Bcpm::Player.reconfigure args[1]
+    when 'list', 'ls'  # Displays the installed players.
+      unless Bcpm::Dist.installed?
+        puts "Please install a battlecode distribution first!"
+        exit 1
+      end
+      puts Bcpm::Player.list_active.sort.join("\n")
     when 'match', 'livematch', 'debugmatch', 'debug'  # Run a match in live or headless mode.
       unless Bcpm::Dist.installed?
         puts "Please install a battlecode distribution first!"
