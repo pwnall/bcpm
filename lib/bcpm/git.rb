@@ -12,6 +12,7 @@ module Git
     FileUtils.mkdir_p File.dirname(local_path)
     success = nil
     Dir.chdir File.dirname(local_path) do
+      FileUtils.rm_rf File.basename(local_path) if File.exists?(local_path)
       if repo_branch == 'master'
         success = Kernel.system 'git', 'clone', repo_uri,
                                 File.basename(local_path)
