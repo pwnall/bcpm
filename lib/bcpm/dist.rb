@@ -92,7 +92,7 @@ module Dist
 
   # Path to the locally installed battlecode distribution.
   def self.default_dist_path
-    if /workspace/ =~ Dir.pwd
+    if File.exist?('.metadata') && File.directory?('.metadata')
       File.expand_path './battlecode'
     else
       File.expand_path '~/battlecode'

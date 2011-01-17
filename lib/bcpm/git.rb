@@ -9,7 +9,7 @@ module Git
   #
   # Returns true for success, false if something went wrong.
   def self.clone_repo(repo_uri, repo_branch, local_path)
-    FileUtils.mkdir_p local_path
+    FileUtils.mkdir_p File.dirname(local_path)
     success = nil
     Dir.chdir File.dirname(local_path) do
       if repo_branch == 'master'
