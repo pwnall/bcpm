@@ -12,6 +12,7 @@ class CaseBase
     # Called before any code is evaluated in the class context.
     def _setup
       @map = nil
+      @suite_map = false
       @vs = nil
       @side = :a
       @match = nil      
@@ -39,10 +40,17 @@ class CaseBase
         @env_used = false
       end
     end
-  
+
     # Set the map for following matches.
     def map(map_name)
       @map = map_name.dup.to_s
+      @suite_map = false
+    end
+    
+    # Set the map for the following match. Use a map in the player's test suite.
+    def suite_map(map_name)
+      @map = map_name.dup.to_s
+      @suite_map = true
     end
   
     # Set the enemy for following matches.
@@ -98,7 +106,8 @@ class CaseBase
     def match(&block)
       begin
         @env_used = true
-        @match = Bcpm::Tests::TestMatch.new @side, @vs, @map, @env, @options
+        map = @suite_map ? @env.suite_map_path(@map) : @map
+        @match = Bcpm::Tests::TestMatch.new @side, @vs, map, @env, @options
         self.class_eval(&block)
         @matches << @match
       ensure

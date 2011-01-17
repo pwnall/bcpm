@@ -70,6 +70,12 @@ class Environment
     @available = false
   end
   
+  # Path to the maps in the test suite for the player.
+  def suite_map_path(map_name)
+    File.join Bcpm::Player.local_root, player_name, 'suite', 'maps',
+              map_name + '.xml'
+  end
+  
   # Queue an operation that adds a file.
   def file_op(op)
     @file_ops << op

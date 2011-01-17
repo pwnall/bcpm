@@ -41,7 +41,7 @@ module Match
   #   player1_name:: name of locally installed player (A)
   #   player2_name:: name of locally installed player (B)
   #   silence_b:: if true, B is silenced; otherwise, A is silenced
-  #   map_name:: name of map .xml file
+  #   map_name:: name of map .xml file (or full path for custom map)
   #   run_live:: if true, tries to run the match using the live UI
   #   bc_options:: hash of simulator settings to be added to bc.conf
   def self.match_data(player1_name, player2_name, silence_b, map_name, run_live, bc_options = {})
@@ -116,7 +116,15 @@ module Match
       'bc.engine.debug-methods' => false,
       'bc.engine.upkeep' => true
     }
+    map_path = nil
+    if map_name
+      if File.basename(map_name) != map_name
+        map_path = File.dirname map_name
+        map_name = File.basename(map_name).sub(/\.xml$/, '')
+      end
+    end
     config['bc.game.maps'] = map_name if map_name
+    config['bc.game.map-path'] = map_path if map_path
     config['bc.game.team-a'] = player1_name if player1_name
     config['bc.game.team-b'] = player2_name if player2_name
     config['bc.server.save-file'] = binfile if binfile

@@ -29,44 +29,34 @@ If you go this route, you will have to create the git repositories yourself, and
     bcpm list
     bcpm ls
 
-5. Run the player's test suite.
-
-    bcpm test yield
-
-6. Run a single test case in the player's test suite.
-
-    bcpm case yield win_vs_yield
-    
-    # The following command runs the first match right away, for maximum iterating speed.
-    bcpm livecase yield win_vs_yield
-
-7. Switch between the 2D and the 3D client.
+5. Switch between the 2D and the 3D client.
 
     bcpm set client3d on
     bcpm set +client3d
     bcpm set client3d off
     bcpm set -client3d
 
-8. Replay the last match ran in a test.
+6. See all the maps in the distribution.
 
-    bcpm replay
+    bcpm listmaps
+    bcpm lsmaps
 
-9. Run a game against some other player code.
+7. Run a game against some other player code.
 
     bcpm match yield team000 venice
 
     # The following command runs the match right away, for maximum enjoyment.
     bcpm livematch yield team000 venice
 
-10. Run a debugging game against some other player code. Debugging games us use bcpm configuration settings instead of production defaults.
+8. Run a debugging game against some other player code. Debugging games us use bcpm configuration settings instead of production defaults.
 
     bcpm debugmatch yield team000 venice
     
-11. Show all settings.
+9. Show all settings.
 
     bcpm config
     
-12. Change debugging settings
+10. Change debugging settings
 
     bcpm set +noupkeep
     bcpm set -noupkeep
@@ -76,25 +66,44 @@ If you go this route, you will have to create the git repositories yourself, and
     bcpm set -breakpoints
     bcpm set debuglimit 1000000  # Maximum number of bytecodes per round in debug_ methods.
 
-13. Remove the installed player. (removing the project folder is not enough!)
+11. Run the player's test suite.
+
+    bcpm test yield
+
+12. Run a single test case in the player's test suite.
+
+    bcpm case yield win_vs_yield
+    
+    # The following command runs the first match right away, for maximum iterating speed.
+    bcpm livecase yield win_vs_yield
+
+13. Replay the last match ran in a test.
+
+    bcpm replay
+    
+14. Copy a distribution map into the test suite, for customization.
+
+    bcpm copymap venice
+
+14. Remove the installed player. (removing the project folder is not enough!)
 
     bcpm uninstall yield
     
-14. Create a new player from an existing template.
+15. Create a new player from an existing template.
 
     bcpm copy myplayer git@git.pwnb.us:six370/yield.git
 
 You'll need to import the project into Eclipse, and setup a git repository for the player.
 
-15. If bcpm crashes or you abort it, you'll need to clean up the temporaries left behind.
+16. If bcpm crashes or you abort it, you'll need to clean up the temporaries left behind.
 
     bcpm clean
   
-16. Use directed find/replace to unroll loops.
+17. Use directed find/replace to unroll loops.
 
     bcpm regen bcpm regen src/yield/test/stubs/LoggingStubs.java
     
-17. After winning the competition, remove the players and distribution. Commit and push first!
+18. After winning the competition, remove the players and distribution. Commit and push first!
 
     bcpm reset
 
@@ -112,6 +121,9 @@ functionality available in a test suite. The suite DSL slightly resembles rspec.
     
     # Set the map for future matches.
     map 'venice'
+
+    # Use a custom map from suite/maps.
+    suite_map 'venice2'
     
     # Disable energon draining. :upkeep is a synonym for 'bc.engine.upkeep'.
     option :upkeep, false

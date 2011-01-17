@@ -57,7 +57,12 @@ class TestMatch
 
   # User-readable description of match conditions.
   def description
-    desc = "as team #{side.to_s.upcase} vs #{vs} on #{map}"
+    if File.basename(map) == map
+      map_name = map
+    else
+      map_name = "suite/maps/#{File.basename(map).sub(/\.xml$/, '')}"
+    end
+    desc = "as team #{side.to_s.upcase} vs #{vs} on #{map_name}"
     unless @options.empty?
       desc += ' with ' + options.map { |k, v| "#{k}=#{v}" }.join(",")
     end
