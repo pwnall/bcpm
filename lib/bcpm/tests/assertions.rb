@@ -8,7 +8,7 @@ module Tests
 module Assertions  
   # Fails unless the match was won.
   def should_win
-    return if match.outcome.index(" (#{match.side.to_s.upcase}) wins")
+    return if match.winner == :a
     raise Bcpm::Tests::AssertionError, "Player was expected to win, but didn't! " + match.outcome
   end
 
@@ -19,7 +19,22 @@ module Assertions
     return if match.reason.index(reason)
     raise Bcpm::Tests::AssertionError, "Player was expected to win by #{reason} and didn't. " +
                                        match.reason
-  end  
+  end
+
+  # Fails unless the match was lost.
+  def should_lose
+    return if match.winner == :b
+    raise Bcpm::Tests::AssertionError, "Player was expected to lose, but didn't! " + match.outcome
+  end
+
+  # Fails unless the match was lost, and the Reason: line includes the argument text. 
+  def should_lose_by(reason)
+    should_lose
+    
+    return if match.reason.index(reason)
+    raise Bcpm::Tests::AssertionError, "Player was expected to win by #{reason} and didn't. " +
+                                       match.reason
+  end
 
   # Fails if the player code threw any exception.
   def should_not_throw

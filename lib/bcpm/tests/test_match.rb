@@ -37,6 +37,11 @@ class TestMatch
     @environment = environment
     @output = nil
     @data = nil
+    
+    @output_lines = nil
+    @outcome = nil
+    @winner = nil
+    @reason = nil
   end
   
   # Run the game.
@@ -81,16 +86,30 @@ class TestMatch
   
   # The output line showing who won the game.
   def outcome
-    outcome = output_lines[-3] || ''
-    outcome = '(no victory)' unless outcome.index('wins')
-    outcome
+    return @outcome if @outcome
+    @outcome = output_lines[-3] || ''
+    @outcome = '(no victory)' unless outcome.index('wins')
+    @outcome
+  end
+  
+  # The side that own the game
+  def winner
+    return @winner if @winner
+    win_match = /\((.)\) wins/.match outcome
+    @winner = if win_match
+      (win_match[1] == 'A') ? :a : :b
+    else
+      :none
+    end
+    @winner
   end
 
   # The output line showing the reason the game ended.
   def reason
-    reason = output_lines[-2] || ''
-    reason = '(no reason)' unless reason.index('Reason:')
-    reason
+    return @reason if @reason
+    @reason = output_lines[-2] || ''
+    @reason = '(no reason)' unless reason.index('Reason:')
+    @reason
   end
   
   # Stashes the match data somewhere on the system.

@@ -8,6 +8,7 @@ lib/bcpm/cleanup.rb
 lib/bcpm/cli.rb
 lib/bcpm/config.rb
 lib/bcpm/dist.rb
+lib/bcpm/duel.rb
 lib/bcpm/git.rb
 lib/bcpm/match.rb
 lib/bcpm/player.rb

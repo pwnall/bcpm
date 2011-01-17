@@ -111,6 +111,20 @@ module CLI
         :file
       end
       puts Bcpm::Match.run(args[1], args[2], args[3], mode)
+    when 'duel'  # Have two players fight it out on all maps.
+      if args.length < 3
+        puts "Pleas supply the player names!"
+        exit 1
+      end
+      if args.length >= 4
+        maps = args[3..-1]
+      else
+        maps = nil
+      end
+      outcome = Bcpm::Duel.duel_pair args[1], args[2], true, maps
+      puts "#{'%-3d' % outcome[:score]} points, #{'%3d' % outcome[:wins]} " +
+           "wins, #{'%3d' % outcome[:losses]} losses, " +
+           "#{'%3d' % outcome[:ties]} ties"
     when 'replay'  # Replay a match using its binlog (.rms file).
       unless Bcpm::Dist.installed?
         puts "Please install a battlecode distribution first!"
