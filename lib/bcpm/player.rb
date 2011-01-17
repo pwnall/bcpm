@@ -267,7 +267,7 @@ module Player
     contents.gsub! 'bc.conf', simulator_config
     contents
   end
-
+  
   # The contents of an Eclipse .classpath for a player project.  
   def self.eclipse_classpath(local_path)
     jar_path = File.join Bcpm::Dist.dist_path, 'lib', 'battlecode-server.jar'
@@ -363,7 +363,7 @@ END_SOURCE
     File.open File.join(suite_path, 'win_vs_yield.rb'), 'wb' do |f| 
       f.write <<END_SOURCE
 vs 'yield'
-map 'venice'
+suite_map '#{Bcpm::Dist.maps.first}'
 replace_class 'RobotPlayer', 'test.players.RobotPlayer'
 
 match do
@@ -373,6 +373,10 @@ match do
 end
 END_SOURCE
     end
+    
+    maps_path = File.join suite_path, 'maps'
+    FileUtils.mkdir_p maps_path
+    Bcpm::Dist.copy_map Bcpm::Dist.maps.first, maps_path
     
     File.open File.join(local_path, '.gitignore'), 'wb' do |f|
       f.write <<END_SOURCE

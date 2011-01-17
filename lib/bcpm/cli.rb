@@ -1,3 +1,5 @@
+require 'fileutils'
+
 # :nodoc: namespace
 module Bcpm
 
@@ -175,6 +177,34 @@ module CLI
         exit 1        
       end
       Bcpm::Regen.run args[1..-1]
+    
+    when 'listmaps', 'lsmaps'  # Lists the map in the battlecode distribution.
+      unless Bcpm::Dist.installed?
+        puts "Please install a battlecode distribution first!"
+        exit 1
+      end
+      puts Bcpm::Dist.maps.sort.join("\n")
+    when 'copymap', 'cpmap'  # Clones a distribution map for testing.
+      unless Bcpm::Dist.installed?
+        puts "Please install a battlecode distribution first!"
+        exit 1
+      end
+      if args.length < 2
+        puts "Please supply the map name and destination"
+        exit 1
+      end
+      if args.length < 3
+        # Default destination.
+        if File.exist?('suite') && File.directory?('suite')
+          FileUtils.mkdir_p 'maps'
+          args[2] = 'suite/maps'
+        else
+          puts "Please supply map destination or cd into a player directory"
+          exit 1
+        end
+      end
+      Bcpm::Dist.copy_map args[1], args[2]
+            
     else
       help
       exit 1

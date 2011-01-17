@@ -75,6 +75,11 @@ module Dist
     File.join dist_path, 'build.xml'
   end
   
+  # Path to the battlecode maps directory.
+  def self.maps_path
+    File.join dist_path, 'maps'
+  end
+  
   # Path to the battlecode simulator configuration file.
   def self.conf_file
     File.join dist_path, 'bc.conf'
@@ -102,6 +107,26 @@ module Dist
   # Git URI to the distribution repository.  
   def self.default_repo_uri
     'git@git.pwnb.us:six370/battlecode2011.git'
+  end
+
+  # Maps installed in the battlecode distribution.
+  def self.maps
+    Dir.glob(File.join(maps_path, '*.xml')).map do |f|
+      File.basename(f).sub(/\.xml$/, '')
+    end
+  end
+
+  # Copies a battlecode distribution map.
+  def self.copy_map(map_name, destination)
+    map_file = File.join maps_path, map_name + '.xml'
+    unless File.exist?(map_file)
+      puts "No map found at#{map_file}"
+      return
+    end
+    if File.exist?(destination) && File.directory?(destination)
+      destionation = File.join destination, map_name + '.xml'
+    end
+    FileUtils.cp map_file, destination
   end
 end
 
