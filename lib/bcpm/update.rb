@@ -1,3 +1,4 @@
+require 'socket'
 require 'tmpdir'
 
 # :nodoc: namespace
@@ -19,7 +20,8 @@ module Update
     
   # Temporary directory name.
   def self.tempdir
-    File.join Dir.tmpdir, 'bcpm', "update_#{(Time.now.to_f * 1000).to_i}_#{$PID}"
+    File.join Dir.tmpdir, 'bcpm',
+        "update_#{Socket.hostname}_#{(Time.now.to_f * 1000).to_i}_#{$PID}"
   end
 
   # Git URI to the bcpm repository.

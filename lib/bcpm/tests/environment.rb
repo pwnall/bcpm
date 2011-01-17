@@ -1,5 +1,6 @@
 require 'English'
 require 'fileutils'
+require 'socket'
 
 # :nodoc: namespace
 module Bcpm
@@ -240,7 +241,8 @@ class Environment
 
   # A player name guaranteed to be unique across the systme.
   def self.new_player_name
-    @prefix ||= "bcpmtest_#{(Time.now.to_f * 1000).to_i}_#{$PID}"
+    @prefix ||=
+        "bcpmtest_#{Socket.hostname}_#{(Time.now.to_f * 1000).to_i}_#{$PID}"
     @counter ||= 0
     @counter += 1
     "#{@prefix}_#{@counter}"

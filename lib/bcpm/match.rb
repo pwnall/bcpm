@@ -1,6 +1,7 @@
 require 'English'
 require 'fileutils'
 require 'shellwords'
+require 'socket'
 require 'thread'
 require 'tmpdir'
 
@@ -240,7 +241,7 @@ END_CONFIG
   
   # Temporary file name.
   def self.tempfile
-    "#{(Time.now.to_f * 1000).to_i}_#{$PID}"
+    "#{Socket.hostname}_#{(Time.now.to_f * 1000).to_i}_#{$PID}"
   end
 end  # module Bcpm::Match
 

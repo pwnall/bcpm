@@ -1,5 +1,3 @@
-require 'tmpdir'
-
 # :nodoc: namespace
 module Bcpm
 
