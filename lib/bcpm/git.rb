@@ -24,7 +24,9 @@ module Git
           success = Kernel.system 'git', 'clone', repo_uri,
                                   File.basename(local_path)
           if success
-            success = Kernel.system 'git', 'checkout', repo_branch
+            Dir.chdir File.basename(local_path) do
+              success = Kernel.system 'git', 'checkout', repo_branch
+            end
           end
         end
       end
