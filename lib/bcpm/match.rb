@@ -82,19 +82,16 @@ module Match
   def self.replay(binfile)
     tempdir = File.join Dir.tmpdir, 'bcpm', 'match_' + tempfile
     FileUtils.mkdir_p tempdir
-    Dir.chdir tempdir do
-      filebase = Dir.pwd
-      match_log = File.join filebase, 'match.log'
+    match_log = File.join tempdir, 'match.log'
 
-      bc_config = simulator_config nil, nil, true, nil, binfile, nil
-      conf_file = File.join filebase, 'bc.conf'      
-      write_config conf_file, bc_config
-      write_ui_config conf_file, false, bc_config
-      build_file = File.join filebase, 'build.xml'
-      write_build build_file, conf_file
-      
-      run_build_script build_file, match_log, 'run'
-    end
+    bc_config = simulator_config nil, nil, true, nil, binfile, nil
+    conf_file = File.join tempdir, 'bc.conf'      
+    write_config conf_file, bc_config
+    write_ui_config conf_file, false, bc_config
+    build_file = File.join tempdir, 'build.xml'
+    write_build build_file, conf_file
+    
+    run_build_script tempdir, build_file, match_log, 'run'
     FileUtils.rm_rf tempdir
   end
   
