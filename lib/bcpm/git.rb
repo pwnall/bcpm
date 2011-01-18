@@ -25,7 +25,8 @@ module Git
                                   File.basename(local_path)
           if success
             Dir.chdir File.basename(local_path) do
-              success = Kernel.system 'git', 'checkout', '-q', repo_branch
+              success = Kernel.system 'git', 'checkout', '-q',
+                                      'origin/' + repo_branch
             end
           end
         end
