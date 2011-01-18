@@ -43,7 +43,12 @@ module Player
     else
       return nil unless Bcpm::Git.checkpoint_repo(repo_uri, repo_branch, local_path)
     end
-    unless source_path = rename(local_path, old_name)
+    if local_name == old_name
+      source_path = package_path(local_path)
+    else
+      source_path = rename(local_path, old_name)
+    end
+    unless source_path
       puts "Repository #{repo_uri} doesn't seem to contain a player!"
       FileUtils.rm_rf local_path      
       return nil
