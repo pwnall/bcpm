@@ -34,7 +34,7 @@ module Git
     Dir.chdir File.dirname(local_path) do
       zip_file = File.basename(local_path) + '.zip'
       success = Kernel.system('git', 'archive', '--remote', repo_uri,
-          '--format', 'zip', '--output', zip_file, '-9', repo_branch)
+          '--format=zip', '--output', zip_file, '-9', repo_branch)
       if success
         Dir.chdir File.basename(File.basename(local_path)) do
           success = Kernel.system 'unzip', '-qq', File.join('..', zip_file)
