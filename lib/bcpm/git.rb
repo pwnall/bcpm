@@ -20,6 +20,13 @@ module Git
       else
         success = Kernel.system 'git', 'clone', '--branch', repo_branch,
                                 repo_uri, File.basename(local_path)
+        unless success
+          success = Kernel.system 'git', 'clone', repo_uri,
+                                  File.basename(local_path)
+          if success
+            success = Kernel.system 'git', 'checkout', repo_branch
+          end
+        end
       end
     end
     FileUtils.rm_rf local_path unless success
