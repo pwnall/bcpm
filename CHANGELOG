@@ -1,3 +1,5 @@
+v0.10.14. Duel output improvements.
+
 v0.10.13. Added duel_threads config flag and multi-threaded dueling.
 
 v0.10.12. More Athena git workarounds.

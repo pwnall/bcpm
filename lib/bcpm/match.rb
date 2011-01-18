@@ -23,7 +23,7 @@ module Match
     end
     match = Bcpm::Tests::TestMatch.new :a, player2_name, map_name, env, options
     match.run(mode != :file)
-    match.stash_data
+    "Winner side: #{match.winner.to_s.upcase}\n" + match.stash_data
   end
   
   # Key-value pairs for friendly => canonical names of battlecode engine options.
@@ -258,7 +258,7 @@ END_CONFIG
   
   # Temporary file name.
   def self.tempfile
-    "#{Socket.hostname}_#{(Time.now.to_f * 1000).to_i}_#{$PID}_#{Thread.current.object_id}"
+    "#{Socket.hostname}_#{'%x' % (Time.now.to_f * 1000).to_i}_#{$PID}_#{'%x' % Thread.current.object_id}"
   end
 end  # module Bcpm::Match
 

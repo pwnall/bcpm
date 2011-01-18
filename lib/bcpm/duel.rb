@@ -54,36 +54,45 @@ module Duel
     Thread.abort_on_exception = old_abort
     
     # Compute stats.
-    score, wins, losses, ties = 0, 0, 0, 0
+    score, wins, losses, errors = 0, 0, 0, 0
     match_count.times do
       match = out_queue.pop
       score_delta = case match.winner
       when :a, :b
         (match.winner == match.side) ? 1 : -1
       else
-        score_delta = 0
+        nil
       end
       if show_progress
         print "#{player1_name} #{match.description}: #{outcome_string(score_delta)}\n"
         STDOUT.flush
       end
-      score += score_delta
+      score += score_delta if score_delta
       case score_delta
       when 1
         wins += 1
       when -1
         losses += 1
-      else
+      when 0
         ties += 1
       end
     end
-    { :score => score, :wins => wins, :losses => losses, :ties => ties }
+    { :score => score, :wins => wins, :losses => losses, :errors => errors }
   end
   
   # The string to be shown for a match outcome.
   def self.outcome_string(score_delta)
     # TODO(pwnall): ANSI color codes
-    {0 => "tie", 1 => "won", -1 => "lost"}[score_delta]
+    if /mingw/ =~ RUBY_PLATFORM ||
+        (/win/ =~ RUBY_PLATFORM && /darwin/ !~ RUBY_PLATFORM)
+      {0 => "error", 1 => "won", -1 => "lost"}[score_delta]
+    else
+      {
+        0 => "\33[33merror\33[0m",
+        1 => "\33[32mwon\33[0m",
+        -1 => "\33[31mlost\33[0m"
+      }[score_delta]
+    end
   end
   
   # Number of threads to use for computing duel matches.

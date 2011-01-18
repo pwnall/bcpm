@@ -99,7 +99,7 @@ class TestMatch
     @winner = if win_match
       (win_match[1] == 'A') ? :a : :b
     else
-      :none
+      :error
     end
     @winner
   end
@@ -124,7 +124,7 @@ class TestMatch
     rms_path = File.join path, data[:uid] + '.rms'
     File.open(rms_path, 'wb') { |f| f.write data[:rms] }  unless File.exist?(rms_path)
   
-    "Output: #{open_binary} #{txt_path}\nReplay: bcpm replay #{rms_path}\n"  
+    "Output: #{open_binary} #{txt_path}\nReplay: bcpm replay #{rms_path}\n"
   end
   
   # All game replays saved by calls to stash_data.
