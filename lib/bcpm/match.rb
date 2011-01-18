@@ -97,6 +97,8 @@ module Match
   
   # Options to be overridden for the battlecode simulator.
   def self.simulator_config(player1_name, player2_name, silence_b, map_name, binfile, txtfile)
+    Bcpm::Config[:client3d] ||= 'off'
+    Bcpm::Config[:sound] ||= 'off'
     config = {
       'bc.engine.silence-a' => !silence_b,
       'bc.engine.silence-b' => !!silence_b,
@@ -104,6 +106,7 @@ module Match
       'bc.server.throttle' => 'yield',
       'bc.server.throttle-count' => 100000,
       'bc.client.opengl' => Bcpm::Config[:client3d],
+      'bc.client.sound-on' => Bcpm::Config[:sound] || 'off',
       
       # Healthy production defaults.
       'bc.engine.breakpoints' => false,

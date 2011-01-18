@@ -29,12 +29,17 @@ If you go this route, you will have to create the git repositories yourself, and
     bcpm list
     bcpm ls
 
-5. Switch between the 2D and the 3D client.
+5a. Switch between the 2D and the 3D client.
 
     bcpm set client3d on
     bcpm set +client3d
     bcpm set client3d off
     bcpm set -client3d
+
+5b. Turn the client sound on or off.
+
+   bcpm set +sound
+   bcpm set -sound
 
 6. See all the maps in the distribution.
 
