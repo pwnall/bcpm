@@ -46,9 +46,6 @@ module Duel
       Thread.new do
         loop do
           break unless match = in_queue.pop
-          if show_progress
-            puts "> #{match.environment.player_name} #{match.description}"
-          end
           match.run false
           out_queue.push match
         end
