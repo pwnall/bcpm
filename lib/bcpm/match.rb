@@ -47,36 +47,32 @@ module Match
   #   bc_options:: hash of simulator settings to be added to bc.conf
   def self.match_data(player1_name, player2_name, silence_b, map_name, run_live, bc_options = {})
     uid = tempfile
-    tempdir = File.join Dir.tmpdir, 'bcpm', 'match_' + uid
+    tempdir = File.expand_path File.join(Dir.tmpdir, 'bcpm', 'match_' + uid)
     FileUtils.mkdir_p tempdir
-    textlog, binlog, antlog = nil, nil, nil, nil, nil
-    Dir.chdir tempdir do
-      filebase = Dir.pwd
-      binfile = File.join filebase, 'match.rms'
-      txtfile = File.join filebase, 'match.txt'
-      build_log = File.join filebase, 'build.log'
-      match_log = File.join filebase, 'match.log'
-      scribe_log = File.join filebase, 'scribe.log' 
+    binfile = File.join tempdir, 'match.rms'
+    txtfile = File.join tempdir, 'match.txt'
+    build_log = File.join tempdir, 'build.log'
+    match_log = File.join tempdir, 'match.log'
+    scribe_log = File.join tempdir, 'scribe.log' 
 
-      bc_config = simulator_config player1_name, player2_name, silence_b, map_name, binfile, txtfile
-      bc_config.merge! bc_options
-      conf_file = File.join filebase, 'bc.conf'      
-      write_config conf_file, bc_config
-      write_ui_config conf_file, true, bc_config if run_live
-      build_file = File.join filebase, 'build.xml'
-      write_build build_file, conf_file
-      
-      if run_live
-        match_output = run_build_script build_file, match_log, 'run', 'Stop buffering match'
-      else
-        match_output = run_build_script build_file, match_log, 'file'
-      end        
-      scribe_output = run_build_script build_file, scribe_log, 'transcribe'
-      
-      textlog = File.exist?(txtfile) ? File.open(txtfile, 'rb') { |f| f.read } : ''
-      binlog = File.exist?(binfile) ? File.open(binfile, 'rb') { |f| f.read } : ''
-      antlog = File.exist?(match_log) ? File.open(match_log, 'rb') { |f| f.read } : match_output
-    end
+    bc_config = simulator_config player1_name, player2_name, silence_b, map_name, binfile, txtfile
+    bc_config.merge! bc_options
+    conf_file = File.join tempdir, 'bc.conf'
+    write_config conf_file, bc_config
+    write_ui_config conf_file, true, bc_config if run_live
+    build_file = File.join tempdir, 'build.xml'
+    write_build build_file, conf_file
+    
+    if run_live
+      run_build_script tempdir, build_file, match_log, 'run', 'Stop buffering match'
+    else
+      run_build_script tempdir, build_file, match_log, 'file'
+    end        
+    run_build_script tempdir, build_file, scribe_log, 'transcribe'
+    
+    textlog = File.exist?(txtfile) ? File.open(txtfile, 'rb') { |f| f.read } : ''
+    binlog = File.exist?(binfile) ? File.open(binfile, 'rb') { |f| f.read } : ''
+    antlog = File.exist?(match_log) ? File.open(match_log, 'rb') { |f| f.read } : ''
     FileUtils.rm_rf tempdir
     
     { :ant => extract_ant_log(antlog), :rms => binlog, :script => textlog, :uid => uid }
@@ -186,44 +182,65 @@ END_CONFIG
   end
   
   # Runs the battlecode Ant script.
-  #
-  # Return the ant stdout (messages not written to the ant log).
-  def self.run_build_script(build_file, log_file, target, run_live = false)
+  def self.run_build_script(target_dir, build_file, log_file, target, run_live = false)
     if run_live
-      command = Shellwords.shelljoin(['ant', '-noinput', '-buildfile', build_file, target])      
-
-      # Start the build as a subprocess, dump its output to the queue as string fragments.
-      # nil means the subprocess completed.
-      queue = Queue.new
-      thread = Thread.start do
-        IO.popen command do |f|
-          begin
-            loop { queue << f.readpartial(1024) }
-          rescue EOFError
-            queue << nil
+      Dir.chdir target_dir do
+        command = Shellwords.shelljoin(['ant', '-noinput', '-buildfile',
+                                        build_file, target])
+  
+        # Start the build as a subprocess, dump its output to the queue as
+        # string fragments. nil means the subprocess completed.
+        queue = Queue.new
+        thread = Thread.start do
+          IO.popen command do |f|
+            begin
+              loop { queue << f.readpartial(1024) }
+            rescue EOFError
+              queue << nil
+            end
           end
         end
+  
+        build_output = ''
+        while fragment = queue.pop
+          # Dump the build output to the screen as the simulation happens.
+          print fragment
+          STDOUT.flush
+          build_output << fragment
+        
+          # Let bcpm carry on when the simulation completes.
+          break if build_output.index(run_live)
+        end
+        build_output << "\n" if build_output[-1] != ?\n
+        
+        # Pretend everything was put in a log file.
+        File.open(log_file, 'wb') { |f| f.write build_output }
+        return thread
       end
-
-      build_output = ''
-      while fragment = queue.pop
-        # Dump the build output to the screen as the simulation happens.
-        print fragment
-        STDOUT.flush
-        build_output << fragment
-      
-        # Let bcpm carry on when the simulation completes.
-        break if build_output.index(run_live)
-      end
-      build_output << "\n" if build_output[-1] != ?\n
-      
-      # Pretend everything was put in a log file.
-      File.open(log_file, 'wb') { |f| f.write build_output }
-      return thread
     else
-      command = Shellwords.shelljoin(['ant', '-noinput', '-buildfile', build_file,
-                                      '-logfile', log_file, target])
-      Kernel.`(command)    
+      command = Shellwords.shelljoin(['ant', '-noinput', '-buildfile',
+                                      build_file, '-logfile', log_file, target])
+      if /mingw/ =~ RUBY_PLATFORM ||
+          (/win/ =~ RUBY_PLATFORM && /darwin/ !~ RUBY_PLATFORM)
+        Dir.chdir target_dir do
+          output = Kernel.`(command)
+          # If there is no log file, dump the output to the log.
+          unless File.exist?(log_file)
+            File.open(log_file, 'wb') { |f| f.write output }
+          end
+        end
+      else
+        pid = fork do
+          Dir.chdir target_dir do
+            output = Kernel.`(command)
+            # If there is no log file, dump the output to the log.
+            unless File.exist?(log_file)
+              File.open(log_file, 'wb') { |f| f.write output }
+            end
+          end
+        end
+        Process.wait pid
+      end
     end
   end
   
@@ -241,7 +258,7 @@ END_CONFIG
   
   # Temporary file name.
   def self.tempfile
-    "#{Socket.hostname}_#{(Time.now.to_f * 1000).to_i}_#{$PID}"
+    "#{Socket.hostname}_#{(Time.now.to_f * 1000).to_i}_#{$PID}_#{Thread.current.object_id}"
   end
 end  # module Bcpm::Match
 

@@ -201,17 +201,14 @@ class Environment
   # Returns true for success, false for failure.
   def build
     uid = "bcpmbuild_#{Socket.hostname}_#{(Time.now.to_f * 1000).to_i}_#{$PID}"
-    tempdir = File.join Dir.tmpdir, 'bcpm', uid
+    tempdir = File.expand_path File.join(Dir.tmpdir, 'bcpm', uid)
     FileUtils.mkdir_p tempdir
-    Dir.chdir tempdir do
-      filebase = Dir.pwd
-      build_log = File.join filebase, 'build.log'
-      build_file = File.join filebase, 'build.xml'
-      build_output = Bcpm::Match.write_build build_file, 'bc.conf'
+    build_log = File.join tempdir, 'build.log'
+    build_file = File.join tempdir, 'build.xml'
+    Bcpm::Match.write_build build_file, 'bc.conf'
       
-      Bcpm::Match.run_build_script build_file, build_log, 'build'
-      @build_log = File.exist?(build_log) ? File.open(build_log, 'rb') { |f| f.read } : build_output      
-    end
+    Bcpm::Match.run_build_script tempdir, build_file, build_log, 'build'
+    @build_log = File.exist?(build_log) ? File.open(build_log, 'rb') { |f| f.read } : ''
     FileUtils.rm_rf tempdir
     
     @build_log.index("\nBUILD SUCCESSFUL\n") ? true : false

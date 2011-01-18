@@ -51,15 +51,19 @@ If you go this route, you will have to create the git repositories yourself, and
 8. Run a debugging game against some other player code. Debugging games us use bcpm configuration settings instead of production defaults.
 
     bcpm debugmatch yield team000 venice
-  
-9. Run a duel between 2 players on multiple maps.
+
+9. Set the number of simultaneous matches to be played in a duel. Match the number of physical cores you have.
+
+    bcpm set duel_threads 2
+
+10. Run a duel between 2 players on multiple maps.
 
     bcpm duel yield team000
     
     # The following command restricts the duel to a subset of maps.
     bcpm duel yield team000 venice fortress
     
-10. Show all settings.
+11. Show all settings.
 
     bcpm config
     

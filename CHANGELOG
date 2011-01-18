@@ -1,3 +1,5 @@
+v0.10.13. Added duel_threads config flag and multi-threaded dueling.
+
 v0.10.12. More Athena git workarounds.
 
 v0.10.11. Made copy support the install scenario.

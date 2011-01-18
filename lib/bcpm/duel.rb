@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'thread'
 
 # :nodoc: namespace
 module Bcpm
@@ -25,34 +26,58 @@ module Duel
       exit 1
     end
     
-    score, wins, losses, ties = 0, 0, 0, 0
+    # Schedule matches.
+    in_queue = Queue.new
+    match_count = 0
     maps.each do |map|
       [:a, :b].each do |side|
         match = Bcpm::Tests::TestMatch.new side, player2_name, map, env
-        if show_progress
-          print "#{player1_name} #{match.description}... "
-          STDOUT.flush
+        in_queue.push match
+        match_count += 1
+      end
+    end
+    duel_threads.times { in_queue.push nil }
+
+    # Execute matches.
+    out_queue = Queue.new
+    old_abort = Thread.abort_on_exception
+    Thread.abort_on_exception = true
+    duel_threads.times do
+      Thread.new do
+        loop do
+          break unless match = in_queue.pop
+          if show_progress
+            puts "> #{match.environment.player_name} #{match.description}"
+          end
+          match.run false
+          out_queue.push match
         end
-        match.run false
-        score_delta = case match.winner
-        when :a, :b
-          (match.winner == side) ? 1 : -1
-        else
-          score_delta = 0
-        end
-        if show_progress          
-          print outcome_string(score_delta) + "\n"
-          STDOUT.flush
-        end
-        score += score_delta
-        case score_delta
-        when 1
-          wins += 1
-        when -1
-          losses += 1
-        else
-          ties += 1
-        end
+      end
+    end
+    Thread.abort_on_exception = old_abort
+    
+    # Compute stats.
+    score, wins, losses, ties = 0, 0, 0, 0
+    match_count.times do
+      match = out_queue.pop
+      score_delta = case match.winner
+      when :a, :b
+        (match.winner == match.side) ? 1 : -1
+      else
+        score_delta = 0
+      end
+      if show_progress
+        print "#{player1_name} #{match.description}: #{outcome_string(score_delta)}\n"
+        STDOUT.flush
+      end
+      score += score_delta
+      case score_delta
+      when 1
+        wins += 1
+      when -1
+        losses += 1
+      else
+        ties += 1
       end
     end
     { :score => score, :wins => wins, :losses => losses, :ties => ties }
@@ -62,7 +87,17 @@ module Duel
   def self.outcome_string(score_delta)
     # TODO(pwnall): ANSI color codes
     {0 => "tie", 1 => "won", -1 => "lost"}[score_delta]
-  end  
+  end
+  
+  # Number of threads to use for computing duel matches.
+  def self.duel_threads
+    (Bcpm::Config[:duel_threads] ||= default_duel_threads).to_i
+  end
+
+  # Number of threads to use for computing duel matches.
+  def self.default_duel_threads
+    1
+  end
 end  # module Bcpm::Duel
 
 end  # namespace Bcpm
