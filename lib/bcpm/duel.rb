@@ -10,7 +10,21 @@ module Duel
                      maps = nil)
     maps ||= Bcpm::Dist.maps.sort
     
+    # Abort in case of typos.
+    [player1_name, player2_name].each do |player|
+      unless Bcpm::Player.wired? player
+        puts "Player #{player} is not installed\n"
+        exit 1
+      end
+    end
+
+    # Abort in case of compile errors.
     env = Bcpm::Tests::Environment.new player1_name
+    unless env.build
+      print env.build_log
+      exit 1
+    end
+    
     score, wins, losses, ties = 0, 0, 0, 0
     maps.each do |map|
       [:a, :b].each do |side|

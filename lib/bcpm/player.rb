@@ -194,11 +194,14 @@ module Player
   #
   # These players can be used into tests and simulations.
   def self.list_active
-    list.select do |player_name|
-      local_path = File.join local_root, player_name
-      source_path = package_path local_path, nil, true
-      source_path && Bcpm::Dist.contains_player?(source_path)
-    end
+    list.select { |player_name| wired? player_name }
+  end
+  
+  # True if the given player name is installed and wired.
+  def self.wired?(player_name)
+    local_path = File.join local_root, player_name
+    source_path = package_path local_path, nil, true
+    (source_path && Bcpm::Dist.contains_player?(source_path)) ? true : false
   end
   
   # Cleans up all the installed players.

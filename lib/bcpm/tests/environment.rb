@@ -14,6 +14,9 @@ module Tests
 class Environment
   # Name of the player container for the enviornment.
   attr_reader :player_name
+  
+  # The build log, if the build happened.
+  attr_reader :build_log
 
   # Creates a new environment blueprint.
   #
@@ -197,7 +200,7 @@ class Environment
   #
   # Returns true for success, false for failure.
   def build
-    uid = 'build_' + player_name
+    uid = "bcpmbuild_#{Socket.hostname}_#{(Time.now.to_f * 1000).to_i}_#{$PID}"
     tempdir = File.join Dir.tmpdir, 'bcpm', uid
     FileUtils.mkdir_p tempdir
     Dir.chdir tempdir do
