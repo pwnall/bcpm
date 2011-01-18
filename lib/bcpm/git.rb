@@ -1,5 +1,5 @@
 require 'fileutils'
-require 'sockets'
+require 'socket'
 
 # :nodoc: namespace
 module Bcpm
