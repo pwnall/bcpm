@@ -61,7 +61,7 @@ module Duel
       when :a, :b
         (match.winner == match.side) ? 1 : -1
       else
-        nil
+        0
       end
       if show_progress
         print "#{player1_name} #{match.description}: #{outcome_string(score_delta)}\n"
@@ -74,7 +74,7 @@ module Duel
       when -1
         losses += 1
       when 0
-        ties += 1
+        errors += 1
       end
     end
     { :score => score, :wins => wins, :losses => losses, :errors => errors }
