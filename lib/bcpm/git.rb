@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'sockets'
 
 # :nodoc: namespace
 module Bcpm
@@ -33,8 +34,8 @@ module Git
     success = nil
     Dir.chdir File.dirname(local_path) do
       zip_file = File.basename(local_path) + '.zip'
-      success = Kernel.system('git', 'archive', '--remote', repo_uri,
-          '--format=zip', '--output', zip_file, '-9', repo_branch)
+      success = Kernel.system('git', 'archive', '--format=zip',
+          '--remote', repo_uri, '--output', zip_file, '-9', repo_branch)
       if success
         Dir.chdir File.basename(File.basename(local_path)) do
           success = Kernel.system 'unzip', '-qq', File.join('..', zip_file)
@@ -42,6 +43,12 @@ module Git
       end
       File.unlink zip_file if File.exist?(zip_file)
     end
+    unless success
+      puts "Trying workaround for old git"
+      success = clone_repo repo_uri, repo_branch, local_path
+      FileUtils.rm_rf File.join(local_path, '.git') if success
+    end
+    
     FileUtils.rm_rf local_path unless success
     success
   end
@@ -64,6 +71,12 @@ module Git
     Dir.chdir local_path do
       Kernel.system 'git', 'pull'
     end
+  end
+
+  # Temporary directory name.
+  def self.tempdir
+    File.join Dir.tmpdir, 'bcpm',
+        "update_#{Socket.hostname}_#{(Time.now.to_f * 1000).to_i}_#{$PID}"
   end
 end  # module Bcpm::Git
 
