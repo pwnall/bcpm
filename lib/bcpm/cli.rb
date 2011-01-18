@@ -124,7 +124,7 @@ module CLI
       outcome = Bcpm::Duel.duel_pair args[1], args[2], true, maps
       puts "#{'%-3d' % outcome[:score]} points, #{'%3d' % outcome[:wins]} " +
            "wins, #{'%3d' % outcome[:losses]} losses, " +
-           "#{'%3d' % outcome[:ties]} ties"
+           "#{'%3d' % outcome[:errors]} errors"
     when 'replay'  # Replay a match using its binlog (.rms file).
       unless Bcpm::Dist.installed?
         puts "Please install a battlecode distribution first!"
