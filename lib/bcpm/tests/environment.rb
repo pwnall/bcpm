@@ -241,8 +241,10 @@ class Environment
 
   # A player name guaranteed to be unique across the systme.
   def self.new_player_name
+    # NOTE: Java doesn't like .s in it package names :)
+    host = Socket.hostname.gsub(/[^A-Za-z_]/, '_')
     @prefix ||=
-        "bcpmtest_#{Socket.hostname}_#{(Time.now.to_f * 1000).to_i}_#{$PID}"
+        "bcpmtest_#{host}_#{(Time.now.to_f * 1000).to_i}_#{$PID}"
     @counter ||= 0
     @counter += 1
     "#{@prefix}_#{@counter}"

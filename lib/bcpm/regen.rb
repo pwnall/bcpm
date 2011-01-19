@@ -89,6 +89,10 @@ module Regen
           end
         end
       end      
+      if current_block
+        print "Un-closed target block #{current_block}\n"
+        exit
+      end
       
       File.open(file_name, 'wb') { |f| f.write output_lines.join("\n") }
     end
