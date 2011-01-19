@@ -122,9 +122,18 @@ module CLI
         maps = nil
       end
       outcome = Bcpm::Duel.duel_pair args[1], args[2], true, maps
-      puts "#{'%-3d' % outcome[:score]} points, #{'%3d' % outcome[:wins]} " +
-           "wins, #{'%3d' % outcome[:losses]} losses, " +
-           "#{'%3d' % outcome[:errors]} errors"
+      puts "#{'%+3d' % outcome[:score]} points, " +
+           "#{'%3d' % outcome[:wins].length} wins, " +
+           " #{'%3d' % outcome[:losses].length} losses, " +
+           "#{'%3d' % outcome[:errors].length} errors"
+    when 'rank'  # Raks all the players.
+      if args.length < 2
+        players = Bcpm::Player.list_active
+      else
+        players = args[1..-1]
+      end
+      outcome = Bcpm::Duel.rank_players players, true, ['chain', 'duel', 'egypt']
+      outcome.each { |score, player| print "%+4d %s\n" % [score, player] }
     when 'replay'  # Replay a match using its binlog (.rms file).
       unless Bcpm::Dist.installed?
         puts "Please install a battlecode distribution first!"
@@ -218,7 +227,6 @@ module CLI
         end
       end
       Bcpm::Dist.copy_map args[1], args[2]
-            
     else
       help
       exit 1

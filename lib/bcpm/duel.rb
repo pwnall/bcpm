@@ -36,13 +36,13 @@ module Duel
         match_count += 1
       end
     end
-    duel_threads.times { in_queue.push nil }
+    match_threads.times { in_queue.push nil }
 
     # Execute matches.
     out_queue = Queue.new
     old_abort = Thread.abort_on_exception
     Thread.abort_on_exception = true
-    duel_threads.times do
+    match_threads.times do
       Thread.new do
         loop do
           break unless match = in_queue.pop
@@ -54,7 +54,7 @@ module Duel
     Thread.abort_on_exception = old_abort
     
     # Compute stats.
-    score, wins, losses, errors = 0, 0, 0, 0
+    score, wins, losses, errors = 0, [], [], []
     match_count.times do
       match = out_queue.pop
       score_delta = case match.winner
@@ -70,11 +70,11 @@ module Duel
       score += score_delta if score_delta
       case score_delta
       when 1
-        wins += 1
+        wins << match
       when -1
-        losses += 1
+        losses << match
       when 0
-        errors += 1
+        errors << match
       end
     end
     { :score => score, :wins => wins, :losses => losses, :errors => errors }
@@ -95,14 +95,30 @@ module Duel
     end
   end
   
-  # Number of threads to use for computing duel matches.
-  def self.duel_threads
-    (Bcpm::Config[:duel_threads] ||= default_duel_threads).to_i
+  # Number of threads to use for simulating matches.
+  def self.match_threads
+    (Bcpm::Config[:match_threads] ||= default_match_threads).to_i
   end
 
-  # Number of threads to use for computing duel matches.
-  def self.default_duel_threads
+  # Number of threads to use for simulating matches.
+  def self.default_match_threads
     1
+  end
+  
+  # Has all players compete against each other.
+  def self.rank_players(player_list, show_progress = false, maps = nil)
+    scores = {}
+    0.upto(player_list.length - 1) do |i|
+      0.upto(i - 1) do |j|
+        outcome = duel_pair player_list[i], player_list[j], show_progress, maps
+        scores[i] ||= 0
+        scores[i] += outcome[:score]
+        scores[j] ||= 0
+        scores[j] -= outcome[:score]
+      end
+    end
+    scores.map { |k, v| [v, player_list[k]] }.
+           sort_by { |score, player| [-score, player] }
   end
 end  # module Bcpm::Duel
 

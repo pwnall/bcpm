@@ -57,9 +57,9 @@ If you go this route, you will have to create the git repositories yourself, and
 
     bcpm debugmatch yield team000 venice
 
-9. Set the number of simultaneous matches to be played in a duel. Match the number of physical cores you have.
+9. Set the number of simultaneous matches. Match the number of physical cores you have.
 
-    bcpm set duel_threads 2
+    bcpm set match_threads 2
 
 10. Run a duel between 2 players on multiple maps.
 
