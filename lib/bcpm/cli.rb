@@ -132,7 +132,7 @@ module CLI
       else
         players = args[1..-1]
       end
-      outcome = Bcpm::Duel.rank_players players, true, ['chain', 'duel', 'egypt']
+      outcome = Bcpm::Duel.rank_players players, true
       outcome.each { |score, player| print "%+4d %s\n" % [score, player] }
     when 'replay'  # Replay a match using its binlog (.rms file).
       unless Bcpm::Dist.installed?
