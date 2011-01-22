@@ -271,6 +271,9 @@ module Player
     contents.gsub! 'basedir="."', 'basedir="' + Bcpm::Dist.dist_path + '"'
     contents.gsub! '<property name="path.base" location="."',
         '<property name="path.base" location="' + Bcpm::Dist.dist_path + '"'
+    # Set VM memory.
+    contents.gsub! /\<jvmarg\s+value\=\"\-Xmx.*\"/,
+                   "<jvmarg value=\"-Xmx#{Bcpm::Match::vm_ram}m\""
     # Replace hardcoded bc.conf reference.
     contents.gsub! 'bc.conf', simulator_config
     contents

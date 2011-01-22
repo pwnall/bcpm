@@ -129,6 +129,16 @@ module Match
     config['bc.server.transcribe-output'] = txtfile if txtfile
     config
   end
+  
+  # Memory to be dedicated to the simulation JVM (in megabytes.)
+  def self.vm_ram
+    (Bcpm::Config['vm_ram'] ||= default_vm_ram).to_i
+  end
+  
+  # Memory to be dedicated to the simulation JVM (in megabytes.)
+  def self.default_vm_ram
+    1024
+  end
     
   # Writes a patched buildfile that references the given configuration file.
   def self.write_build(buildfile, conffile)

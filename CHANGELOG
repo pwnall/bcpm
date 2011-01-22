@@ -1,3 +1,5 @@
+v0.10.19. Added vm_ram config flag.
+
 v0.10.18. Bugfix in rank command.
 
 v0.10.17. Added rank command.

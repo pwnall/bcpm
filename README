@@ -53,6 +53,10 @@ If you go this route, you will have to create the git repositories yourself, and
     # The following command runs the match right away, for maximum enjoyment.
     bcpm livematch yield team000 venice
 
+7b. Game too slow? Increase the JVM memory.
+
+    bcpm set vm_ram 1024
+
 8. Run a debugging game against some other player code. Debugging games us use bcpm configuration settings instead of production defaults.
 
     bcpm debugmatch yield team000 venice
