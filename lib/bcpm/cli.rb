@@ -128,7 +128,7 @@ module CLI
            "#{'%3d' % outcome[:errors].length} errors"
     when 'rank'  # Raks all the players.
       if args.length < 2
-        players = Bcpm::Player.list_active
+        players = Bcpm::Player.list_active.sort
       else
         players = args[1..-1]
       end
