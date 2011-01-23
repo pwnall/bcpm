@@ -201,7 +201,7 @@ module CLI
       end
       Bcpm::Regen.run args[1..-1]
     
-    when 'listmaps', 'lsmaps'  # Lists the map in the battlecode distribution.
+    when 'lsmaps', 'lsmap', 'maps', 'map'  # Lists the maps in the distribution.
       unless Bcpm::Dist.installed?
         puts "Please install a battlecode distribution first!"
         exit 1
