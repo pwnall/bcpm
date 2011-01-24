@@ -126,7 +126,7 @@ module CLI
            "#{'%3d' % outcome[:wins].length} wins, " +
            " #{'%3d' % outcome[:losses].length} losses, " +
            "#{'%3d' % outcome[:errors].length} errors"
-    when 'rank'  # Raks all the players.
+    when 'rank'  # Ranks all the players.
       if args.length < 2
         players = Bcpm::Player.list_active.sort
       else
@@ -134,6 +134,21 @@ module CLI
       end
       outcome = Bcpm::Duel.rank_players players, true
       outcome.each { |score, player| print "%+4d %s\n" % [score, player] }
+    when 'pit'  # Pits one player against all the other players.
+      if args.length < 2
+        puts "Please supply a player name!"
+      end
+      player = args[1]
+      if args.length >= 3
+        enemies = args[2..-1]
+      else
+        enemies = Bcpm::Player.list_active.sort - player
+      end
+      outcome = Bcpm::Duel.score_player player, enemies, true
+      puts "#{'%+4d' % outcome[:points]} points"
+      outcome[:scores].each do |score, player|
+        print "%+4d vs %s\n" % [score, player]
+      end
     when 'replay'  # Replay a match using its binlog (.rms file).
       unless Bcpm::Dist.installed?
         puts "Please install a battlecode distribution first!"

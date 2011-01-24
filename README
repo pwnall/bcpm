@@ -65,18 +65,32 @@ If you go this route, you will have to create the git repositories yourself, and
 
     bcpm set match_threads 2
 
-10. Run a duel between 2 players on multiple maps.
+10a. Run a duel between 2 players on multiple maps.
 
     bcpm duel yield team000
     
     # The following command restricts the duel to a subset of maps.
     bcpm duel yield team000 venice fortress
+
+10b. Pit a player against other players you have installed.
+
+    bcpm pit yield team000 team001
     
-11. Show all settings.
+    # The following pits against all other installed players.
+    bcpm pit yield
+    
+10c. Rank players by their total scores in all possible pairwise duels.
+ 
+    bcpm rank yield team000 team001
+    
+    # The following ranks all installed players.
+    bcpm rank
+ 
+11a. Show all settings.
 
     bcpm config
     
-11. Change debugging settings
+11b. Change debugging settings
 
     bcpm set +noupkeep
     bcpm set -noupkeep

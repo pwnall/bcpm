@@ -25,38 +25,17 @@ module Duel
       print env.build_log
       exit 1
     end
-    
-    # Schedule matches.
-    in_queue = Queue.new
-    match_count = 0
-    maps.each do |map|
-      [:a, :b].each do |side|
-        match = Bcpm::Tests::TestMatch.new side, player2_name, map, env
-        in_queue.push match
-        match_count += 1
-      end
-    end
-    match_threads.times { in_queue.push nil }
 
-    # Execute matches.
-    out_queue = Queue.new
-    old_abort = Thread.abort_on_exception
-    Thread.abort_on_exception = true
-    match_threads.times do
-      Thread.new do
-        loop do
-          break unless match = in_queue.pop
-          match.run false
-          out_queue.push match
-        end
+    # Compute the matches.
+    matches = maps.map { |map_name|
+      [:a, :b].map do |side|
+        Bcpm::Tests::TestMatch.new side, player2_name, map_name, env
       end
-    end
-    Thread.abort_on_exception = old_abort
+    }.flatten
     
     # Compute stats.
     score, wins, losses, errors = 0, [], [], []
-    match_count.times do
-      match = out_queue.pop
+    multiplex_matches(matches) do |match|
       score_delta = case match.winner
       when :a, :b
         (match.winner == match.side) ? 1 : -1
@@ -78,6 +57,42 @@ module Duel
       end
     end
     { :score => score, :wins => wins, :losses => losses, :errors => errors }
+  end
+  
+  # Runs may matches in parallel.
+  #
+  # Returns the given matches. If given a block, also yields each match as it
+  # becomes available.
+  def self.multiplex_matches(matches)
+     # Schedule matches.
+    in_queue = Queue.new
+    matches.each do |match|
+      in_queue.push match
+    end
+    match_threads.times { in_queue.push nil }
+
+    # Execute matches.
+    out_queue = Queue.new
+    old_abort = Thread.abort_on_exception
+    Thread.abort_on_exception = true
+    match_threads.times do
+      Thread.new do
+        loop do
+          break unless match = in_queue.pop
+          match.run false
+          out_queue.push match
+        end
+      end
+    end
+    Thread.abort_on_exception = old_abort
+   
+    matches.length.times do
+      match = out_queue.pop
+      if Kernel.block_given?
+        yield match
+      end
+    end
+    matches
   end
   
   # The string to be shown for a match outcome.
@@ -119,6 +134,19 @@ module Duel
     end
     scores.map { |k, v| [v, player_list[k]] }.
            sort_by { |score, player| [-score, player] }
+  end
+
+  # Scores one player against the other players.
+  def self.score_player(player, player_list, show_progress = false, maps = nil)
+    player_list = player_list - [player]
+    scores = player_list.map do |opponent|
+       [
+         duel_pair(player, opponent, show_progress, maps)[:score],
+         opponent
+       ]
+    end
+    { :points => scores.map(&:first).inject(0) { |a, b| a + b},
+      :scores => scores.sort_by { |score, player| [score, player] } }    
   end
 end  # module Bcpm::Duel
 
