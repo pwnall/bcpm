@@ -142,7 +142,7 @@ module CLI
       if args.length >= 3
         enemies = args[2..-1]
       else
-        enemies = Bcpm::Player.list_active.sort - player
+        enemies = Bcpm::Player.list_active.sort - [player]
       end
       outcome = Bcpm::Duel.score_player player, enemies, true
       puts "#{'%+4d' % outcome[:points]} points"
